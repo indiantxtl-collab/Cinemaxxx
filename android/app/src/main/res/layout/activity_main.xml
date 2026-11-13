@@ -34,10 +34,9 @@
         android:visibility="invisible" />
 
     <!-- Native cinematic intro: one composited canvas view draws the whole
-         reveal - an expanding blue/violet/pink colour field, the Cinemax emblem
-         dollying in with a light sweep, and the CINEMAX wordmark rising beneath
-         it. It hands over after a themed first paint or a safety timeout,
-         whichever comes first. -->
+         reveal - a dark-red colour field and the cinemaxxx logo dollying in
+         with a light sweep. No text is drawn. It hands over after a themed
+         first paint or a safety timeout, whichever comes first. -->
     <FrameLayout
         android:id="@+id/cinemax_splash"
         android:layout_width="match_parent"

@@ -31,8 +31,10 @@ env:
   # The DOM layer must really run in CI: jsdom is installed below, and a missing
   # jsdom is treated as a failure instead of a silent skip.
   CINEMAXXX_REQUIRE_JSDOM: "1"
-  CINEMAXXX_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL }}
-  NEXT_PUBLIC_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL }}
+  # The app's own origin. The repository variable wins when it is set; otherwise
+  # the project's domain is used, so a fresh fork still builds the right origin.
+  CINEMAXXX_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL || 'https://cinemaxxx.cinemaxtv.space' }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL || 'https://cinemaxxx.cinemaxtv.space' }}
 
 jobs:
   apk:
@@ -65,17 +67,35 @@ jobs:
       # The debug variant is built first on purpose: android/build.sh wipes
       # android/build/ each run, so the release build below must be the last one
       # to touch it (the test log and the splash preview are written afterwards).
-      - name: Require the independent deployment origin and private release identity
+      # Release signing needs four repository secrets. With none of them set, the
+      # job still builds, signs (debug key) and tests the APK, and says so in the
+      # job summary. A partial set is a configuration error and fails the job.
+      - name: Decide the signing path (release secrets or debug-only)
         env:
           KEYSTORE_BASE64: ${{ secrets.CINEMAXXX_KEYSTORE_BASE64 }}
           KEY_ALIAS: ${{ secrets.CINEMAXXX_KEY_ALIAS }}
           STORE_PASS: ${{ secrets.CINEMAXXX_STORE_PASS }}
           KEY_PASS: ${{ secrets.CINEMAXXX_KEY_PASS }}
         run: |
-          test -n "$CINEMAXXX_SITE_URL" || { echo '::error::Set the CINEMAXXX_SITE_URL repository variable to this fork HTTPS origin'; exit 1; }
+          test -n "$CINEMAXXX_SITE_URL" || { echo '::error::the deployment origin is empty'; exit 1; }
+          set_count=0
           for name in KEYSTORE_BASE64 KEY_ALIAS STORE_PASS KEY_PASS; do
-            test -n "${!name:-}" || { echo "::error::Set the CINEMAXXX_$name repository secret"; exit 1; }
+            if [ -n "${!name:-}" ]; then set_count=$((set_count + 1)); fi
           done
+          if [ "$set_count" -eq 0 ]; then
+            echo "RELEASE_SIGNING=0" >> "$GITHUB_ENV"
+            {
+              echo "### Release APK not built"
+              echo "The repository has no release-signing secrets (CINEMAXXX_KEYSTORE_BASE64, CINEMAXXX_KEY_ALIAS, CINEMAXXX_KEY_PASS, CINEMAXXX_STORE_PASS)."
+              echo "This run builds, signs and tests the debug-signed APK only. Add the secrets to produce the release APK."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::release secrets not set - building the debug-signed APK only"
+            exit 0
+          fi
+          if [ "$set_count" -ne 4 ]; then
+            echo "::error::set all four release secrets (CINEMAXXX_KEYSTORE_BASE64, CINEMAXXX_KEY_ALIAS, CINEMAXXX_KEY_PASS, CINEMAXXX_STORE_PASS) or none"
+            exit 1
+          fi
           umask 077
           python3 - <<'PYEOF'
           import base64, os
@@ -85,6 +105,7 @@ jobs:
           key.chmod(0o600)
           with open(os.environ["GITHUB_ENV"], "a") as output:
               output.write(f"CINEMAXXX_KEYSTORE={key}\n")
+              output.write("RELEASE_SIGNING=1\n")
           PYEOF
 
       - name: Build and sign the debuggable variant
@@ -105,6 +126,7 @@ jobs:
           echo "debug APK: $(wc -c <"$apk") bytes, debuggable, same id/version as release"
 
       - name: Build, sign and verify the release APK
+        if: env.RELEASE_SIGNING == '1'
         env:
           CINEMAXXX_KEY_ALIAS: ${{ secrets.CINEMAXXX_KEY_ALIAS }}
           CINEMAXXX_STORE_PASS: ${{ secrets.CINEMAXXX_STORE_PASS }}
@@ -118,7 +140,10 @@ jobs:
       - name: Run the Android test suite
         run: |
           mkdir -p android/build
-          bash android/tests/run-tests.sh --skip-build | tee android/build/test-suite.log
+          if [ "$RELEASE_SIGNING" = "1" ]; then apk=android/dist/cinemaxxx-1.1.0.apk; else apk=android/dist/cinemaxxx-1.1.0-debug.apk; fi
+          [ -f "$apk" ] || { echo "::error::the APK under test is missing: $apk"; exit 1; }
+          echo "CINEMAXXX_TEST_APK=$PWD/$apk" >> "$GITHUB_ENV"
+          CINEMAXXX_TEST_APK="$PWD/$apk" bash android/tests/run-tests.sh --skip-build | tee android/build/test-suite.log
 
       - name: Verify the test evidence
         run: |
@@ -153,7 +178,7 @@ jobs:
           {
             echo "### Android checks"
             grep -E "checks: " "$log" | sed 's/^/ - /'
-            echo " - APK: $(wc -c <android/dist/cinemaxxx-1.1.0.apk) bytes"
+            echo " - APK under test: $(basename "$CINEMAXXX_TEST_APK") ($(wc -c < "$CINEMAXXX_TEST_APK") bytes)"
           } >>"$GITHUB_STEP_SUMMARY"
           grep -E "checks: " "$log"
 
@@ -163,8 +188,10 @@ jobs:
       - name: Report the artefact
         run: |
           cd android/dist
-          sha256sum cinemaxxx-1.1.0.apk | tee cinemaxxx-1.1.0.apk.sha256
-          ls -l cinemaxxx-1.1.0.apk
+          for apk in cinemaxxx-1.1.0.apk cinemaxxx-1.1.0-debug.apk; do
+            if [ -f "$apk" ]; then sha256sum "$apk" | tee "$apk.sha256"; fi
+          done
+          ls -l ./*.apk
 
       - name: Upload the installable APK
         uses: actions/upload-artifact@v7
@@ -175,6 +202,7 @@ jobs:
             android/dist/cinemaxxx-latest.apk
             android/dist/cinemaxxx-1.1.0.apk.sha256
             android/dist/cinemaxxx-1.1.0-debug.apk
+            android/dist/cinemaxxx-1.1.0-debug.apk.sha256
             android/dist/cinemaxxx-latest-debug.apk
             android/build/test-suite.log
             android/build/splash-preview.log
@@ -236,6 +264,16 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: "1"
+
+      - name: Verify the built site uses this deployment's origin
+        run: |
+          origin="$NEXT_PUBLIC_SITE_URL"
+          grep -rq --include=*.html "rel=\"canonical\" href=\"$origin\"" .next/server/app \
+            || { echo "::error::the built home page has no canonical URL for $origin"; exit 1; }
+          if grep -rqs "cinemax-orpin.vercel.app\|www.cinemaxtv.space" .next/server .next/static; then
+            echo "::error::the build still references a retired host"; exit 1
+          fi
+          echo "built site canonical: $origin"
 
       # The legal documents are static pages, so their finished HTML exists only
       # after the build. This reads those pages and checks the anchors, the

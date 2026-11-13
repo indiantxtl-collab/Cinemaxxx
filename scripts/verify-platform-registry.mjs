@@ -96,7 +96,7 @@ check(
   cinemax?.logo ?? "-"
 );
 check(
-  !readFileSync(join(assetDir, "cinemax.webp")).equals(readFileSync(join(root, "public", "brand", "cinemax-symbol.svg"))),
+  !readFileSync(join(assetDir, "cinemax.webp")).equals(readFileSync(join(root, "public", "brand", "cinemaxxx-logo.png"))),
   "the CINEMAX platform logo is not a copy of the app logo"
 );
 

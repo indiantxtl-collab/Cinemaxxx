@@ -52,7 +52,7 @@ test("layouts stay within desktop, mobile and 320px screens; navigation survives
       const menu = page.getByRole("navigation", { name: "App sections" });
       await expect(menu).toBeVisible();
       await expect(menu.getByRole("link", { name: /Home/ })).toBeVisible();
-      await expect(menu.locator("img.nav-menu-logo")).toHaveAttribute("src", "/brand/cinemax-symbol.svg");
+      await expect(menu.locator("img.nav-menu-logo")).toHaveAttribute("src", "/brand/cinemaxxx-logo-256.png");
       await expect(menu.getByRole("link", { name: /Search/ })).toBeVisible();
       await expect(menu.getByRole("link", { name: /Categories/ })).toHaveCount(0);
       const moreButton = menu.getByRole("button", { name: "Open More panel" });

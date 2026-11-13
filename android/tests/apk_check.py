@@ -134,8 +134,6 @@ def main() -> int:
     packaged_assets = [
         "assets/cinemax/app-shell.js",
         "assets/cinemax/app-theme.css",
-        "assets/cinemax/fonts/OUTFIT-LICENSE.txt",
-        "assets/cinemax/fonts/outfit-semibold.ttf",
     ]
     check(
         sorted(name for name in names if name.startswith("assets/cinemax/")) == packaged_assets,
@@ -228,7 +226,7 @@ def main() -> int:
             any(name.startswith(f"res/mipmap-{density}") and name.endswith("ic_launcher_round.png") for name in names),
             f"legacy round launcher icon exists for {density}",
         )
-    check(any("cinemax_emblem" in name for name in names), "the Cinemax logo drawable is packaged")
+    check(any("cinemaxxx_logo" in name for name in names), "the cinemaxxx logo drawable is packaged")
     check(any("cinemax_window_background" in name for name in names),
           "the near-black launch window with the centred logo is packaged")
     check(any("cinemax_splash_background" in name for name in names),
@@ -287,7 +285,7 @@ def main() -> int:
             return found
 
         window_values = attribute_values(parse_axml(read_entry(apk, window_entry)))
-        check(any(value == "0xff020202" for value in window_values),
+        check(any(value == "0xff030102" for value in window_values),
               "the launch window paints the page's own deep-black canvas")
         check(not any(value in ("0xff5e96ff", "0xffef76cb", "0xff7c4dff") for value in window_values),
               "the launch window no longer flashes the coloured splash gradient")
@@ -310,7 +308,7 @@ def main() -> int:
     ):
         check(descriptor in dex, f"{descriptor.decode()} is in classes.dex")
     check(("https://" + host + "/").encode() in dex, "the configured production URL is compiled into the APK")
-    check(b"cinemax-orpin.vercel.app" not in dex and b"cinemaxtv.space" not in dex, "no original deployment URL is compiled into the fork")
+    check(b"cinemax-orpin.vercel.app" not in dex and b"www.cinemaxtv.space" not in dex and b"//cinemaxtv.space/" not in dex, "no original deployment URL is compiled into the fork")
     check(b"CinemaxNative" in dex, "the JavaScript bridge name is present")
     check(b"__cinemaxInsets" in dex, "the inset hand-off to the page is present")
 

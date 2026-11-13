@@ -198,6 +198,40 @@ builds/tests both variants and removes the temporary key. CI has not been run on
 GitHub in this session. The Gradle-free script produces APKs, not a Play Store
 AAB; use your release process for store packaging.
 
+## 6a. Custom domain: `cinemaxxx.cinemaxtv.space`
+
+The application's own origin is `https://cinemaxxx.cinemaxtv.space`. It is used
+for canonical URLs, `robots.txt` and `sitemap.xml`, Open Graph and share links,
+the PWA manifest, the Android origin and App Links. Third-party, API-provider and
+database hosts are not part of this change and must not be pointed at it.
+
+Manual steps (DNS, Vercel and the Android side are not automated by the repo):
+
+1. **DNS** (`cinemaxtv.space` zone): add `cinemaxxx` as a `CNAME` to the target
+   Vercel shows for the domain (normally `cname.vercel-dns.com`). Do not change
+   any existing record for `cinemaxtv.space` or other subdomains.
+2. **Vercel**: Project `cinemaxxx` -> Settings -> Domains -> add
+   `cinemaxxx.cinemaxtv.space`, and wait for the certificate to show as issued.
+3. **Vercel environment** (Production): set `NEXT_PUBLIC_SITE_URL` to
+   `https://cinemaxxx.cinemaxtv.space`, then redeploy `main`.
+4. **Deployment protection**: turn it off for the production deployment (or the
+   public site stays behind Vercel's login page).
+5. **Auth**: the admin login is a first-party JWT cookie (`admin_token`,
+   host-only, `HttpOnly`, `SameSite=Lax`, `Secure` in production). It has no
+   third-party OAuth callback, so no provider console needs a redirect URI. If an
+   OAuth provider is added later, register `https://cinemaxxx.cinemaxtv.space/...`
+   as its redirect URI.
+6. **Android**: build with `CINEMAXXX_SITE_URL=https://cinemaxxx.cinemaxtv.space`
+   (also set the GitHub repository variable of that name). `android/tools/configure-deployment.py`
+   refuses the old CINEMAX hosts and `localhost`. Then set the release signing
+   certificate's SHA-256 in `public/.well-known/assetlinks.json` and serve that
+   file from the new origin, so App Links verify for this host.
+7. **Verify** after DNS propagates:
+   `curl -sI https://cinemaxxx.cinemaxtv.space/robots.txt`,
+   `curl -s https://cinemaxxx.cinemaxtv.space/sitemap.xml`,
+   `curl -sI https://cinemaxxx.cinemaxtv.space/.well-known/assetlinks.json`,
+   and `https://cinemaxxx.cinemaxtv.space/api/health`.
+
 ## 7. Age declaration and limits
 
 The first-entry dialog asks **“Are you 18 or older?”**. Yes stores a local

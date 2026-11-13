@@ -236,7 +236,7 @@ export const PLATFORM_BRAND_NOTICES: readonly PlatformBrandNotice[] = [
     service: "CINEMAX",
     owner: "Home Box Office, Inc. (Warner Bros. Discovery, Inc.)",
     use: "Official cinemaxxx brand artwork, used nominatively to label titles available on the cinemaxxx network.",
-    note: "This is a third-party mark and is treated as one. It is deliberately different from this project's own cinemaxxx identity: the application's emblem, wordmark and app icon are original artwork belonging to this project (see /copyright) and are not the cinemaxxx network's logo. Warner Bros. Discovery revived the cinemaxxx brand for its linear channels in September 2025.",
+    note: "This is a third-party mark and is treated as one. It is deliberately different from this project's own cinemaxxx identity: the application's logo and app icon are the project's own artwork (see /copyright) and are not the cinemaxxx network's logo. Warner Bros. Discovery revived the cinemaxxx brand for its linear channels in September 2025.",
   },
 ];
 
@@ -382,8 +382,8 @@ export const FONT_ATTRIBUTIONS: readonly FontAttribution[] = [
     designer: "The Outfit Project Authors",
     licence: "SIL Open Font License 1.1",
     licenceUrl: "https://openfontlicense.org",
-    file: "src/app/fonts/OUTFIT-LICENSE.txt (also packaged in the Android app at assets/cinemax/fonts/)",
-    use: "Display face: headings, the cinemaxxx wordmark and the native splash wordmark.",
+    file: "src/app/fonts/OUTFIT-LICENSE.txt",
+    use: "Display face: headings and titles on the web app.",
   },
   {
     family: "Manrope",
@@ -400,8 +400,8 @@ export const IMAGE_NOTES = [
   "Where a title uses artwork hosted by The Movie Database (image.tmdb.org), it is displayed at a reduced size through TMDB's public image service and remains the property of the film's rights holders, as listed by TMDB. TMDB's own terms apply to that service; this website is not endorsed or certified by TMDB.",
   "Artwork is requested lazily, at a size appropriate for the container, and is never modified, recoloured, cropped into a different aspect ratio, or overlayed with a filter. The one exception is the small number of brand logos documented above, which are scaled only.",
   "The platform marks in public/platforms are the platforms' own artwork, sourced from the third-party brand libraries recorded on /attributions. They are not redrawn, recoloured or substituted with text.",
-  "The cinemaxxx emblem, wordmark lockup and app icon are original vector artwork created for this project and are used under this project's own copyright.",
-  "The Android application icon, splash artwork and system notification assets are generated from that same original emblem.",
+  "The cinemaxxx logo and app icon are the project's own artwork, supplied by the project owner, and are used under this project's own copyright.",
+  "The Android application icon and splash artwork are generated from that same logo.",
 ] as const;
 
 export const ICON_NOTES = [

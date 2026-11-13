@@ -253,10 +253,10 @@ check(Boolean(cinemaxEntry), "CINEMAX: is declared as a streaming platform");
 check(cinemaxEntry?.logo === "/platforms/cinemax.webp", "CINEMAX: platform artwork is in the shared collection", cinemaxEntry?.logo ?? "-");
 
 for (const [path, label] of [
-  ["src/components/Logo.tsx", "application lockup (emblem + wordmark, vector)"],
-  ["public/brand/cinemax-symbol.svg", "application emblem, standalone vector"],
-  ["public/brand/cinemax-app-icon.svg", "application icon, vector"],
-  ["android/app/src/main/res/drawable/cinemax_emblem.xml", "native splash emblem"],
+  ["src/components/Logo.tsx", "application logo component (uploaded artwork)"],
+  ["public/brand/cinemaxxx-logo.png", "application logo, uploaded artwork"],
+  ["public/icon-512.png", "application icon"],
+  ["android/app/src/main/res/drawable-nodpi/cinemaxxx_logo.png", "native splash logo"],
 ]) {
   let ok = true;
   try {
@@ -274,7 +274,7 @@ check(!entries.some(({ logo }) => /cinemax\.svg$/i.test(logo)),
   "CINEMAX: the platform logo is not the application's emblem file");
 if (cinemaxEntry) {
   const platformArt = readFileSync(join(assetDir, "cinemax.webp"));
-  check(!platformArt.equals(readFileSync(join(root, "public", "brand", "cinemax-symbol.svg"))),
+  check(!platformArt.equals(readFileSync(join(root, "public", "brand", "cinemaxxx-logo.png"))),
     "CINEMAX: platform logo is not a copy of the application logo");
   check(/cinemax\.webp$/.test(cinemaxEntry.logo), "CINEMAX: platform logo is the network brand artwork");
 }

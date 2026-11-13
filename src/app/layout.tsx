@@ -21,16 +21,38 @@ function canonicalSiteUrl(): string {
 
 const siteUrl = canonicalSiteUrl();
 
+const TITLE = "cinemaxxx — Movies & Series";
+const DESCRIPTION = "Discover movies, series and anime. Save your favourites and pick up where you left off on cinemaxxx.";
+
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
-  title: { default: "cinemaxxx — Movies & Series", template: "%s · cinemaxxx" },
-  description: "Discover movies, series and anime. Save your favourites and pick up where you left off on cinemaxxx.",
+  applicationName: "cinemaxxx",
+  title: { default: TITLE, template: "%s · cinemaxxx" },
+  description: DESCRIPTION,
   manifest: "/manifest.json",
-  icons: [
-    { rel: "icon", url: "/brand/cinemax-symbol.svg", type: "image/svg+xml" },
-    { rel: "icon", url: "/icon-192.png" },
-    { rel: "apple-touch-icon", url: "/icon-192.png" },
-  ],
+  ...(siteUrl ? { alternates: { canonical: "/" } } : {}),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16.png", type: "image/png", sizes: "16x16" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  openGraph: {
+    type: "website",
+    siteName: "cinemaxxx",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: siteUrl || undefined,
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "cinemaxxx" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og-image.png"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -43,7 +65,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return <html lang="en" suppressHydrationWarning>
     <body className={`${manrope.variable} ${outfit.variable}`}>
-      <script dangerouslySetInnerHTML={{ __html: `try { if (sessionStorage.getItem('cinemax:prism-intro:v1') === '1') document.documentElement.dataset.cinemaxIntro = 'seen'; } catch {}` }} />
+      <script dangerouslySetInnerHTML={{ __html: `try { var d = document.documentElement; if (sessionStorage.getItem('cinemax:prism-intro:v1') === '1') { d.dataset.cinemaxIntro = 'seen'; } else if (location.pathname === '/' && localStorage.getItem('cinemaxxx:age-declaration:v1') === 'accepted' && sessionStorage.getItem('cinemaxxx:age-declined:v1') !== '1') { d.dataset.cinemaxIntroPending = '1'; } } catch {}` }} />
       <AgeDeclaration>
         <SplashScreen />
         <AppChrome>{children}</AppChrome>

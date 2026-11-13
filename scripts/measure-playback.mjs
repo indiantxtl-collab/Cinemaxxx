@@ -185,7 +185,7 @@ for (const testCase of CASES) {
   const watcher = setInterval(() => {
     if (firstRequestAt === null && hits.length > before) firstRequestAt = Number(process.hrtime.bigint() - started) / 1e6;
   }, 5);
-  const outcome = await resolveWebPlayback(`${base}${testCase.path}`, { embedderOrigin: "https://cinemaxtv.space" });
+  const outcome = await resolveWebPlayback(`${base}${testCase.path}`, { embedderOrigin: "https://cinemaxxx.cinemaxtv.space" });
   const elapsed = Number(process.hrtime.bigint() - started) / 1e6;
   clearInterval(watcher);
   const plan = outcome.ok ? outcome.resolution.playback : { strategy: "error" };

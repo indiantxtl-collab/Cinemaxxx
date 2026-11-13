@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The launch window: deep near-black with the Cinemax logo centred, so the
+  The launch window: deep near-black with the cinemaxxx logo centred, so the
   cold-start surface (and the API 31+ system splash) already shows the logo the
   in-app reveal starts from. It is deliberately flat ink - the app's own reveal
-  brings the white / silver lighting up over it, so nothing flashes.
+  brings the dark-red light up over it, so nothing flashes.
 -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:angle="270"
-                android:centerColor="#030303"
-                android:endColor="#020202"
-                android:startColor="#020202"
+                android:centerColor="#030102"
+                android:endColor="#030102"
+                android:startColor="#030102"
                 android:type="linear" />
         </shape>
     </item>
@@ -20,6 +20,6 @@
     <item
         android:width="128dp"
         android:height="128dp"
-        android:drawable="@drawable/cinemax_emblem"
+        android:drawable="@drawable/cinemaxxx_logo"
         android:gravity="center" />
 </layer-list>

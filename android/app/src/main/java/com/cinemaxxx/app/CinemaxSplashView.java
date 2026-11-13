@@ -15,29 +15,25 @@ import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
 /**
- * The native Cinemax launch screen: a short cinematic composition that ends on
- * the Cinemax lockup - the existing emblem with the CINEMAX wordmark beneath it.
+ * The native cinemaxxx launch screen: a short cinematic composition on a dark-red
+ * light that ends on the logo alone. There is no text in it.
  *
  * The choreography (all of the arithmetic lives in {@link SplashMotion}):
  *
- *   1. a clean, nearly black canvas, with a restrained blue-violet light coming
- *      up around the centre;
- *   2. three broad, curved colour bands - blue above, violet through purple in
- *      the middle, pink-magenta below - expanding out of that central
+ *   1. a clean, nearly black canvas, with a dim red light coming up around the
+ *      centre;
+ *   2. three broad, curved bands of deep red expanding out of that central
  *      composition towards the edges, each on its own clock so they parallax;
- *   3. the logo dollying up from the size the launch window left it at, with a
- *      controlled overshoot and settle, lifting just enough for the finished
- *      logo-and-wordmark pair to be centred as a whole, crossed once by a
- *      blue-to-pink light sweep;
- *   4. the CINEMAX wordmark fading up a short way beneath the settled logo.
- *
+ *   3. the logo dollying in from the size the launch window left it at, with a
+ *      controlled overshoot and settle, centred on the screen and crossed once
+ *      by a red light sweep.
+
  * Why it stays smooth on Android:
  *
  *   · one view, one draw pass, one {@code invalidate()} per frame - no child
@@ -60,7 +56,7 @@ import android.view.animation.LinearInterpolator;
  *
  * The timeline itself lives in {@link SplashMotion} (pure arithmetic, unit
  * tested on the JVM) and the geometry in {@link SplashMotion#layout}, which is
- * what keeps the lockup complete, centred and inside its margins on every screen
+ * what keeps the logo centred and inside its margins on every screen
  * size and in every orientation.
  */
 public final class CinemaxSplashView extends View {
@@ -68,34 +64,34 @@ public final class CinemaxSplashView extends View {
     /** The full launch reveal. */
     public static final int MODE_INTRO = 0;
     /**
-     * Still frame of the finished lockup. Used when the page is reloaded
+     * Still frame of the finished logo. Used when the page is reloaded
      * (offline retry, renderer restart, activity restoration): the same
      * branding, never a replay of the launch animation.
      */
     public static final int MODE_HOLD = 1;
 
     /** Deep near-black canvas; the lights are drawn on top of it. */
-    private static final int INK = 0xFF020202;
+    private static final int INK = 0xFF030102;
 
     /**
      * The wash is the product's own specular light now: two soft white pools and
      * one pink pool, the same three lights the web splash uses. Nothing here is
      * blue or violet any more.
      */
-    private static final int WASH_BLUE = 0x29FFFFFF;
-    private static final int WASH_BLUE_OUT = 0x00FFFFFF;
-    private static final int WASH_VIOLET = 0x12FFFFFF;
-    private static final int WASH_VIOLET_OUT = 0x00FFFFFF;
-    private static final int WASH_PINK = 0x17EF76CB;
-    private static final int WASH_PINK_OUT = 0x00EF76CB;
+    private static final int WASH_UPPER = 0x26E0182A;
+    private static final int WASH_UPPER_OUT = 0x00E0182A;
+    private static final int WASH_MIDDLE = 0x14B0081C;
+    private static final int WASH_MIDDLE_OUT = 0x00B0081C;
+    private static final int WASH_LOWER = 0x12FF2A3A;
+    private static final int WASH_LOWER_OUT = 0x00FF2A3A;
     /** A very soft vertical base so the colour field never meets bare ink. */
-    private static final int BASE_TOP = 0x240A0A0A;
-    private static final int BASE_MID = 0x0F070707;
-    private static final int BASE_BOTTOM = 0x1C050505;
+    private static final int BASE_TOP = 0x240A0102;
+    private static final int BASE_MID = 0x0F070102;
+    private static final int BASE_BOTTOM = 0x1C050001;
 
-    /** Glow: a white-hot core easing through silver into the one pink accent. */
+    /** Glow: a hot red core easing through deep crimson into black. */
     private static final int[] GLOW_COLOURS = {
-            0x6BFFFFFF, 0x47EDEDED, 0x2ED8D8D8, 0x17EF76CB, 0x08EF76CB, 0x00020202,
+            0x8CFF3B4E, 0x59E0182A, 0x33C0101F, 0x1A8A0A14, 0x08600008, 0x00020102,
     };
     private static final float[] GLOW_STOPS = {0f, 0.22f, 0.48f, 0.70f, 0.88f, 1f};
 
@@ -103,9 +99,9 @@ public final class CinemaxSplashView extends View {
     private static final int[] DEPTH_COLOURS = {0xB8000000, 0x52000000, 0x00000000};
     private static final float[] DEPTH_STOPS = {0f, 0.45f, 1f};
 
-    /** The sweep: pink trailing edge, white-hot core, silver leading edge. */
+    /** The sweep: a crimson trailing edge, a pale red-white core, a crimson leading edge. */
     private static final int[] SWEEP_COLOURS = {
-            0x00EF76CB, 0x99EF76CB, 0xE6FFFFFF, 0xB3E4E4E4, 0x00E4E4E4,
+            0x00FF2A3A, 0x99FF2A3A, 0xE6FFD0D6, 0xB3E0182A, 0x00E0182A,
     };
     private static final float[] SWEEP_STOPS = {0f, 0.26f, 0.52f, 0.78f, 1f};
     private static final float SWEEP_ANGLE_DEGREES = -20f;
@@ -137,33 +133,26 @@ public final class CinemaxSplashView extends View {
      */
 
     /** Upper band: deep blue into electric blue, cross-fading down into violet. */
-    private static final int[] BAND_BLUE_COLOURS = {0xF2305AD6, 0xE85A3BD8};
-    private static final float[] BAND_BLUE_STOPS = {0f, 1f};
-    private static final float BAND_BLUE_TOP = 0f;
-    private static final float BAND_BLUE_BOTTOM = 0.40f;
-    private static final float BAND_BLUE_OVERLAP = 0.06f;
+    private static final int[] BAND_UPPER_COLOURS = {0xF2A0101F, 0xE8E0182A};
+    private static final float[] BAND_UPPER_STOPS = {0f, 1f};
+    private static final float BAND_UPPER_TOP = 0f;
+    private static final float BAND_UPPER_BOTTOM = 0.40f;
+    private static final float BAND_UPPER_OVERLAP = 0.06f;
 
     /** Middle band: violet through purple, ramping in over the blue's fade. */
-    private static final int[] BAND_VIOLET_COLOURS = {0xF26A45E0, 0xE8A03BC0};
-    private static final float[] BAND_VIOLET_STOPS = {0f, 1f};
-    private static final float BAND_VIOLET_TOP = 0.26f;
-    private static final float BAND_VIOLET_BOTTOM = 0.68f;
-    private static final float BAND_VIOLET_OVERLAP = 0.06f;
+    private static final int[] BAND_MIDDLE_COLOURS = {0xF2701018, 0xE8B0141F};
+    private static final float[] BAND_MIDDLE_STOPS = {0f, 1f};
+    private static final float BAND_MIDDLE_TOP = 0.26f;
+    private static final float BAND_MIDDLE_BOTTOM = 0.68f;
+    private static final float BAND_MIDDLE_OVERLAP = 0.06f;
 
     /** Lower band: magenta into the brand pink, brightest at the bottom edge. */
-    private static final int[] BAND_PINK_COLOURS = {0xF0C2409E, 0xF2EF76CB};
-    private static final float[] BAND_PINK_STOPS = {0f, 1f};
-    private static final float BAND_PINK_TOP = 0.56f;
-    private static final float BAND_PINK_BOTTOM = 1f;
-    private static final float BAND_PINK_OVERLAP = 0.06f;
+    private static final int[] BAND_LOWER_COLOURS = {0xF0600C18, 0xF2A0121F};
+    private static final float[] BAND_LOWER_STOPS = {0f, 1f};
+    private static final float BAND_LOWER_TOP = 0.56f;
+    private static final float BAND_LOWER_BOTTOM = 1f;
+    private static final float BAND_LOWER_OVERLAP = 0.06f;
 
-    /** The wordmark: brand typeface, brand tracking, no effects. */
-    private static final String WORDMARK = "cinemaxxx";
-    private static final String WORDMARK_ASSET = "cinemax/fonts/outfit-semibold.ttf";
-    private static final String WORDMARK_FALLBACK_FAMILY = "sans-serif-medium";
-    private static final int WORDMARK_COLOUR = 0xFFF7F4FF;
-    /** How far the wordmark travels up, in units of its own text size. */
-    private static final float WORDMARK_RISE_EM = 0.34f;
 
     /* -------------------------------------------------------------- state */
 
@@ -184,7 +173,6 @@ public final class CinemaxSplashView extends View {
     private final Paint glowPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
     private final Paint depthPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
     private final Paint sweepPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint wordmarkPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG);
     private final PorterDuffXfermode sweepBlend = new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP);
 
     private final Rect ambientSrc = new Rect();
@@ -201,14 +189,6 @@ public final class CinemaxSplashView extends View {
     private Bitmap depthSprite;
     private Shader sweepShader;
     private Drawable emblem;
-
-    private boolean typefaceResolved;
-    /** Measured width of the wordmark at its designed size, for the fit check. */
-    private float wordmarkMeasured;
-    /** The text size actually used (reduced only if the screen is too narrow). */
-    private float wordmarkTextSize;
-    /** Baseline used at rest; the reveal adds the rise offset to it. */
-    private float wordmarkBaseline;
 
     private SplashMotion.Layout geometry;
     private boolean laidOut;
@@ -257,7 +237,7 @@ public final class CinemaxSplashView extends View {
                 : SplashMotion.REDUCED_MOTION_MIN_VISIBLE_MILLIS;
     }
 
-    /** Called once per launch, when the lockup has landed and the page may take over. */
+    /** Called once per launch, when the logo has landed and the page may take over. */
     public void setRevealListener(Runnable listener) {
         this.revealListener = listener;
     }
@@ -393,7 +373,7 @@ public final class CinemaxSplashView extends View {
         // The light follows the logo: it blooms around the centre of the screen
         // where the artwork starts, and settles around where the artwork ends.
         float logoProgress = layerProgress(SplashMotion.LAYER_LOGO);
-        float logoCentreY = logoCentreY(logoProgress);
+        float logoCentreY = geometry.centreY;
 
         float glow = SplashMotion.glowAlpha(layerProgress(SplashMotion.LAYER_GLOW));
         if (glow > 0.004f && glowSprite != null) {
@@ -418,7 +398,6 @@ public final class CinemaxSplashView extends View {
         }
 
         drawLogo(canvas, logoProgress, logoCentreY);
-        drawWordmark(canvas);
     }
 
     /* ------------------------------------------------------------- drawing */
@@ -466,9 +445,8 @@ public final class CinemaxSplashView extends View {
         if (alpha <= 0.004f) {
             return;
         }
-        // The logo never rotates and never leaves the horizontal centre: the
-        // entrance is a dolly (with a small controlled settle) plus a short lift
-        // that centres the finished logo-and-wordmark pair as a whole.
+        // The logo never rotates and never leaves the centre: the entrance is a
+        // dolly with a small controlled settle, so it is symmetric at every instant.
         float half = geometry.logoSize
                 * SplashMotion.logoScale(progress, geometry.logoStartScale) * 0.5f;
         emblem.setAlpha(alphaOf(alpha));
@@ -516,35 +494,6 @@ public final class CinemaxSplashView extends View {
         canvas.restoreToCount(restore);
     }
 
-    /**
-     * The CINEMAX wordmark, revealed after the logo has settled. It is plain
-     * text: the brand face, the brand tracking, one solid colour and no shadow or
-     * outline, so it stays crisp against the colour field at any size.
-     */
-    private void drawWordmark(Canvas canvas) {
-        if (wordmarkTextSize <= 0f) {
-            return;
-        }
-        float progress = layerProgress(SplashMotion.LAYER_WORDMARK);
-        float alpha = SplashMotion.wordmarkAlpha(progress);
-        if (alpha <= 0.004f) {
-            return;
-        }
-        float rise = SplashMotion.wordmarkRise(progress) * wordmarkTextSize * WORDMARK_RISE_EM;
-        wordmarkPaint.setAlpha(alphaOf(alpha));
-        // Android's centred text layout includes the trailing letter-space, so
-        // the optical centre is half a space to the left without this.
-        float opticalCentre = geometry.centreX
-                + wordmarkTextSize * SplashMotion.WORDMARK_LETTER_SPACING_EM * 0.5f;
-        canvas.drawText(WORDMARK, opticalCentre, wordmarkBaseline + rise, wordmarkPaint);
-    }
-
-    /** Centre of the logo at a point in the reveal: the screen centre first. */
-    private float logoCentreY(float logoProgress) {
-        return geometry.centreY
-                - geometry.lockupLift * SplashMotion.logoRise(logoProgress);
-    }
-
     /* ------------------------------------------------------------- sprites */
 
     /**
@@ -567,9 +516,9 @@ public final class CinemaxSplashView extends View {
         int waveWidth = geometry.waveSpriteWidth;
         int waveHeight = geometry.waveSpriteHeight;
         waveSprites = new Bitmap[] {
-                buildBlueBand(waveWidth, waveHeight),
-                buildVioletBand(waveWidth, waveHeight),
-                buildPinkBand(waveWidth, waveHeight),
+                buildUpperBand(waveWidth, waveHeight),
+                buildMiddleBand(waveWidth, waveHeight),
+                buildLowerBand(waveWidth, waveHeight),
         };
         for (int band = 0; band < waveSprites.length; band++) {
             waveSrc[band].set(0, 0, waveWidth, waveHeight);
@@ -583,7 +532,6 @@ public final class CinemaxSplashView extends View {
         depthSprite = buildSprite(depthSide, DEPTH_COLOURS, DEPTH_STOPS);
         depthSrc.set(0, 0, depthSide, depthSide);
 
-        buildWordmark();
     }
 
     private void releaseSprites() {
@@ -591,8 +539,6 @@ public final class CinemaxSplashView extends View {
         waveSprites = null;
         glowSprite = null;
         depthSprite = null;
-        wordmarkMeasured = 0f;
-        wordmarkTextSize = 0f;
     }
 
     /**
@@ -610,11 +556,11 @@ public final class CinemaxSplashView extends View {
         canvas.drawRect(0f, 0f, width, height, paint);
         float longEdge = Math.max(width, height);
         canvas.drawRect(0f, 0f, width, height, wash(paint, width * 0.30f, height * 0.24f,
-                longEdge * 0.62f, WASH_BLUE, WASH_BLUE_OUT));
+                longEdge * 0.62f, WASH_UPPER, WASH_UPPER_OUT));
         canvas.drawRect(0f, 0f, width, height, wash(paint, width * 0.52f, height * 0.50f,
-                longEdge * 0.36f, WASH_VIOLET, WASH_VIOLET_OUT));
+                longEdge * 0.36f, WASH_MIDDLE, WASH_MIDDLE_OUT));
         canvas.drawRect(0f, 0f, width, height, wash(paint, width * 0.74f, height * 0.66f,
-                longEdge * 0.56f, WASH_PINK, WASH_PINK_OUT));
+                longEdge * 0.56f, WASH_LOWER, WASH_LOWER_OUT));
         return bitmap;
     }
 
@@ -638,51 +584,51 @@ public final class CinemaxSplashView extends View {
     }
 
     /** The upper band: the top of the screen down to the first curved boundary. */
-    private static Bitmap buildBlueBand(int width, int height) {
+    private static Bitmap buildUpperBand(int width, int height) {
         Bitmap bitmap = newBandBitmap(width, height);
         Canvas canvas = new Canvas(bitmap);
-        float[] edge = shift(EDGE_UPPER, BAND_BLUE_OVERLAP);
+        float[] edge = shift(EDGE_UPPER, BAND_UPPER_OVERLAP);
         Path band = new Path();
         band.moveTo(0f, 0f);
         band.lineTo(width, 0f);
         band.lineTo(width, edge[13] * height);
         reverseBoundary(band, edge, width, height);
         band.close();
-        canvas.drawPath(band, bandPaint(height, BAND_BLUE_TOP, BAND_BLUE_BOTTOM,
-                BAND_BLUE_COLOURS, BAND_BLUE_STOPS));
+        canvas.drawPath(band, bandPaint(height, BAND_UPPER_TOP, BAND_UPPER_BOTTOM,
+                BAND_UPPER_COLOURS, BAND_UPPER_STOPS));
         return bitmap;
     }
 
     /** The middle band: between the two curved boundaries. */
-    private static Bitmap buildVioletBand(int width, int height) {
+    private static Bitmap buildMiddleBand(int width, int height) {
         Bitmap bitmap = newBandBitmap(width, height);
         Canvas canvas = new Canvas(bitmap);
-        float[] top = shift(EDGE_UPPER, -BAND_VIOLET_OVERLAP);
-        float[] bottom = shift(EDGE_LOWER, BAND_VIOLET_OVERLAP);
+        float[] top = shift(EDGE_UPPER, -BAND_MIDDLE_OVERLAP);
+        float[] bottom = shift(EDGE_LOWER, BAND_MIDDLE_OVERLAP);
         Path band = new Path();
         band.moveTo(0f, top[1] * height);
         forwardBoundary(band, top, width, height);
         band.lineTo(width, bottom[13] * height);
         reverseBoundary(band, bottom, width, height);
         band.close();
-        canvas.drawPath(band, bandPaint(height, BAND_VIOLET_TOP, BAND_VIOLET_BOTTOM,
-                BAND_VIOLET_COLOURS, BAND_VIOLET_STOPS));
+        canvas.drawPath(band, bandPaint(height, BAND_MIDDLE_TOP, BAND_MIDDLE_BOTTOM,
+                BAND_MIDDLE_COLOURS, BAND_MIDDLE_STOPS));
         return bitmap;
     }
 
     /** The lower band: from the second curved boundary down to the bottom edge. */
-    private static Bitmap buildPinkBand(int width, int height) {
+    private static Bitmap buildLowerBand(int width, int height) {
         Bitmap bitmap = newBandBitmap(width, height);
         Canvas canvas = new Canvas(bitmap);
-        float[] edge = shift(EDGE_LOWER, -BAND_PINK_OVERLAP);
+        float[] edge = shift(EDGE_LOWER, -BAND_LOWER_OVERLAP);
         Path band = new Path();
         band.moveTo(0f, edge[1] * height);
         forwardBoundary(band, edge, width, height);
         band.lineTo(width, height);
         band.lineTo(0f, height);
         band.close();
-        canvas.drawPath(band, bandPaint(height, BAND_PINK_TOP, BAND_PINK_BOTTOM,
-                BAND_PINK_COLOURS, BAND_PINK_STOPS));
+        canvas.drawPath(band, bandPaint(height, BAND_LOWER_TOP, BAND_LOWER_BOTTOM,
+                BAND_LOWER_COLOURS, BAND_LOWER_STOPS));
         return bitmap;
     }
 
@@ -732,53 +678,6 @@ public final class CinemaxSplashView extends View {
                 edge[0] * width, edge[1] * height);
     }
 
-    /**
-     * Resolves the wordmark for this screen size: the brand face where it can be
-     * loaded, the platform medium sans otherwise, at the designed size - reduced
-     * only if the screen is too narrow for it. The measurement happens once per
-     * size, never per frame.
-     */
-    private void buildWordmark() {
-        ensureTypeface();
-        wordmarkPaint.setTextAlign(Paint.Align.CENTER);
-        wordmarkPaint.setColor(WORDMARK_COLOUR);
-        wordmarkPaint.setLetterSpacing(SplashMotion.WORDMARK_LETTER_SPACING_EM);
-        float size = geometry.wordmarkSize;
-        wordmarkPaint.setTextSize(size);
-        wordmarkMeasured = wordmarkPaint.measureText(WORDMARK);
-        if (wordmarkMeasured > geometry.wordmarkMaxWidth && wordmarkMeasured > 0f) {
-            size = size * (geometry.wordmarkMaxWidth / wordmarkMeasured);
-            wordmarkPaint.setTextSize(size);
-            wordmarkMeasured = wordmarkPaint.measureText(WORDMARK);
-        }
-        wordmarkTextSize = size;
-        // Recomputed rather than taken from the layout maths so a reduced text
-        // size keeps the same air below the logo instead of drifting up.
-        wordmarkBaseline = geometry.wordmarkCapTop + size * SplashMotion.WORDMARK_CAP_RATIO;
-    }
-
-    /**
-     * The brand face ships with the app as a static instance of the same Outfit
-     * variable font the website uses (SIL Open Font License, kept next to it).
-     * If it cannot be loaded for any reason the splash falls back to the
-     * platform medium sans rather than failing to draw the lockup.
-     */
-    private void ensureTypeface() {
-        if (typefaceResolved) {
-            return;
-        }
-        typefaceResolved = true;
-        Typeface loaded = null;
-        try {
-            loaded = Typeface.createFromAsset(getContext().getAssets(), WORDMARK_ASSET);
-        } catch (Exception unavailable) {
-            loaded = null;
-        }
-        wordmarkPaint.setTypeface(loaded != null
-                ? loaded
-                : Typeface.create(WORDMARK_FALLBACK_FAMILY, Typeface.NORMAL));
-    }
-
     private void buildSweepLayer() {
         float half = geometry.sweepBandHalf;
         sweepShader = new LinearGradient(-half, 0f, half, 0f, SWEEP_COLOURS, SWEEP_STOPS,
@@ -790,9 +689,9 @@ public final class CinemaxSplashView extends View {
             return;
         }
         try {
-            // The one and only copy of the logo artwork (shared with the app
-            // icon, the launch window and the offline screen).
-            emblem = getResources().getDrawable(R.drawable.cinemax_emblem, null).mutate();
+            // The uploaded logo, drawn from its single transparent 512px PNG (the
+            // same artwork as the launch window and the system splash).
+            emblem = getResources().getDrawable(R.drawable.cinemaxxx_logo, null).mutate();
         } catch (Exception missing) {
             emblem = null;
         }
@@ -808,7 +707,7 @@ public final class CinemaxSplashView extends View {
     }
 
     /**
-     * Tells the activity the lockup has landed. Posted rather than run inline so
+     * Tells the activity the logo has landed. Posted rather than run inline so
      * the activity can dismiss the splash (and cancel this animator) without
      * re-entering the animation callback.
      */
@@ -842,7 +741,7 @@ public final class CinemaxSplashView extends View {
 
     /**
      * Respects "Remove animations" / the developer animation scale: the splash
-     * then shows the finished lockup and hands over sooner instead of forcing
+     * then shows the finished logo and hands over sooner instead of forcing
      * motion the user asked to avoid.
      */
     private static boolean resolveAnimationsEnabled(Context context) {

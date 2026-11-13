@@ -94,11 +94,11 @@ export default function LicensePage() {
               <LegalBullets
                 items={[
                   <>
-                    <strong>This project&apos;s identity.</strong> The cinemaxxx emblem (the
-                    folded-ribbon “C”), the cinemaxxx wordmark, the app icon and the splash
-                    animation are original artwork created for this catalogue. They belong
-                    to this project and appear at <code>/brand/cinemax-symbol.svg</code>,{" "}
-                    <code>/brand/cinemax-app-icon.svg</code> and in{" "}
+                    <strong>This project&apos;s identity.</strong> The cinemaxxx logo, the app
+                    icon and the splash animation are the project&apos;s own artwork,
+                    supplied for this catalogue. They belong
+                    to this project and appear at <code>/brand/cinemaxxx-logo.png</code>,{" "}
+                    <code>/icon-512.png</code> and in{" "}
                     <code>src/components/Logo.tsx</code>.
                   </>,
                   <>
@@ -113,7 +113,7 @@ export default function LicensePage() {
               <LegalCallout title="Two identities, no overlap">
                 <p>
                   The artwork used for the CINEMAX platform entry is not this project&apos;s
-                  emblem, and this project&apos;s emblem is not the cinemaxxx network&apos;s
+                  logo, and this project&apos;s logo is not the cinemaxxx network&apos;s
                   logo. They were deliberately kept apart: replacing one with the other
                   would either misrepresent a third-party brand or repurpose this
                   project&apos;s own identity.
