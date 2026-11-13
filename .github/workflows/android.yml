@@ -222,6 +222,9 @@ jobs:
       # fallback fails here instead of on a phone.
       - name: Verify the sharing rules
         run: npm run verify:share
+        env:
+          # The check builds share URLs only; it makes no request to this origin.
+          NEXT_PUBLIC_SITE_URL: https://verification.example.invalid
 
       # The APK the download button hands out is the one this workflow builds;
       # this checks the artifact that is committed for the website, so a broken
