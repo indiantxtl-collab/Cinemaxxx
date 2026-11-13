@@ -10,7 +10,7 @@ import { preparePage } from "./helpers";
  */
 
 const FIXTURE_BASE = process.env.PLAYBACK_FIXTURE_BASE || "http://127.0.0.1:8900";
-const ADMIN = { email: process.env.ADMIN_EMAIL || "admin@cinemax.com", password: process.env.ADMIN_PASSWORD || "Admin@123" };
+const ADMIN = { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD };
 
 async function fixtureAvailable(request: APIRequestContext) {
   try {
@@ -300,6 +300,7 @@ test("the studio saves and reopens a movie URL without losing player query param
   const title = `Admin URL preservation test ${Date.now()}`;
   const updatedTitle = `${title} updated`;
   const source = `${FIXTURE_BASE}/movie/315162?color=B72CDD&autoplay=true`;
+  await preparePage(page);
   let movieId: number | undefined;
 
   try {
@@ -320,7 +321,7 @@ test("the studio saves and reopens a movie URL without losing player query param
       }));
     }
     await page.goto("/gate-keeper/dashboard", { waitUntil: "domcontentloaded" });
-    await expect(page.getByRole("heading", { name: "Cinemax studio", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "cinemaxxx studio", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "movies", exact: true }).click();
     await page.getByRole("button", { name: "+ Add", exact: true }).click();
     await page.locator(".studio-dashboard input.glass-input").first().fill(title);

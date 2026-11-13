@@ -68,14 +68,14 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className="share-card-copy">
-          <p className="share-card-eyebrow">Shared from CINEMAX</p>
+          <p className="share-card-eyebrow">Shared from cinemaxxx</p>
           <h1 className="share-card-title">{record.title}</h1>
           {subtitle && <p className="share-card-meta">{subtitle}</p>}
           {record.description && <p className="share-card-synopsis">{record.description}</p>}
 
           <div className="share-card-actions">
             <CinematicLink href={`/movie/${record.id}`} icon={<Icon name="play" />}>
-              Watch on CINEMAX
+              Watch on cinemaxxx
             </CinematicLink>
             <ShareActions title={shareable} />
           </div>
@@ -115,7 +115,7 @@ export default async function SharePage({ params }: { params: Promise<{ id: stri
 
           <p className="share-card-note">
             Poster and backdrop are the title&apos;s own artwork. Platform names and logos belong to their respective owners;
-            CINEMAX is not affiliated with them.{" "}
+            cinemaxxx is not affiliated with them.{" "}
             <Link className="share-card-note-link" href={shareCardPath(record.id)}>
               Preview card
             </Link>

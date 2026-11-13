@@ -61,7 +61,7 @@ export function getPool(): Pool {
     const ssl = needsSsl(rawUrl);
     const pool = new Pool({
       connectionString: ssl ? stripSslParams(rawUrl) : rawUrl,
-      ssl: ssl ? { rejectUnauthorized: false } : undefined,
+      ssl: ssl ? { rejectUnauthorized: true } : undefined,
       // Serverless functions should keep the pool small.
       max: process.env.VERCEL ? 3 : 10,
       idleTimeoutMillis: 10_000,

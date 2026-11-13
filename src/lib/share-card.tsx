@@ -148,11 +148,11 @@ function clamp(value: string, max: number): string {
  * mark bottom-left so the card is unmistakably from this catalogue.
  */
 export function ShareCard({ title, assets }: { title: CardTitle | null; assets: CardAssets }): ReactElement {
-  const heading = title?.title?.trim() || "CINEMAX";
+  const heading = title?.title?.trim() || "cinemaxxx";
   const subtitle = title ? subtitleOf(title) : "Movies, series and anime";
   const synopsis = title?.description ? clamp(title.description, 190) : "";
   const footerNote = title
-    ? "Watch on CINEMAX · Platform names and logos belong to their respective owners"
+    ? "Watch on cinemaxxx · Platform names and logos belong to their respective owners"
     : "Movies, series and anime · Streaming-platform names and logos belong to their owners";
 
   return (
@@ -217,7 +217,7 @@ export function ShareCard({ title, assets }: { title: CardTitle | null; assets: 
         <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
             {assets.emblem && <img src={assets.emblem} alt="" width={54} height={54} style={{ width: 54, height: 54 }} />}
-            <div style={{ display: "flex", fontSize: 30, letterSpacing: 2, color: "#f4f4f4" }}>CINEMAX</div>
+            <div style={{ display: "flex", fontSize: 30, letterSpacing: 2, color: "#f4f4f4" }}>cinemaxxx</div>
           </div>
           <div
             style={{
@@ -261,7 +261,7 @@ export function ShareCard({ title, assets }: { title: CardTitle | null; assets: 
               fontSize: 24,
             }}
           >
-            {title ? "Watch on CINEMAX" : "Explore CINEMAX"}
+            {title ? "Watch on cinemaxxx" : "Explore cinemaxxx"}
           </div>
         </div>
       </div>

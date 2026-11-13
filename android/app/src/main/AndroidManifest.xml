@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cinemax.app"
+    package="com.cinemaxxx.app"
     android:versionCode="2"
     android:versionName="1.1.0">
 
@@ -21,7 +21,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name="com.cinemax.app.MainActivity"
+            android:name="com.cinemaxxx.app.MainActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden|keyboard|navigation|uiMode|density|fontScale|locale|layoutDirection|mcc|mnc|touchscreen"
             android:exported="true"
             android:launchMode="singleTask"
@@ -39,8 +39,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="cinemaxtv.space" />
-                <data android:scheme="https" android:host="www.cinemaxtv.space" />
+                <data android:scheme="https" android:host="__CINEMAXXX_HOST__" />
+                <data android:scheme="https" android:host="www.__CINEMAXXX_HOST__" />
             </intent-filter>
         </activity>
 
@@ -51,8 +51,8 @@
             been granted a read permission by the chooser can read a file.
         -->
         <provider
-            android:name="com.cinemax.app.ShareFileProvider"
-            android:authorities="com.cinemax.app.share.files"
+            android:name="com.cinemaxxx.app.ShareFileProvider"
+            android:authorities="com.cinemaxxx.app.share.files"
             android:exported="false"
             android:grantUriPermissions="true" />
     </application>

@@ -94,7 +94,7 @@ async function streamMovie(
       return jsonError("The configured gateway returned a non-video response.", 502);
     }
 
-    const safeFilename = movie.title.replace(/[^a-z0-9 ._-]/gi, "").trim().slice(0, 100) || "Cinemax-video";
+    const safeFilename = movie.title.replace(/[^a-z0-9 ._-]/gi, "").trim().slice(0, 100) || "cinemaxxx-video";
     const responseHeaders = new Headers({
       "Cache-Control": "private, no-store, no-transform",
       "X-Content-Type-Options": "nosniff",

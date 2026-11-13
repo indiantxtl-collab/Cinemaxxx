@@ -111,7 +111,7 @@ export type CollectionSpec = {
 };
 
 export const COLLECTION_SPECS: readonly CollectionSpec[] = [
-  { slug: "trending", name: "Trending Now", eyebrow: "Verified Spotlight", description: "Verified playable films and restorations leading the Cinemax library." },
+  { slug: "trending", name: "Trending Now", eyebrow: "Verified Spotlight", description: "Verified playable films and restorations leading the cinemaxxx library." },
   { slug: "movies", name: "Movies", eyebrow: "Feature Films", description: "Verified full-length feature films across classic, independent, and open cinema." },
   { slug: "new-releases", name: "Latest Releases", eyebrow: "Recent Years", description: "Modern open-license releases, recent restorations, and contemporary cinema." },
   { slug: "popular", name: "Popular", eyebrow: "Audience Favorites", description: "Widely acclaimed classics and open-movie milestones." },
@@ -130,7 +130,7 @@ export const COLLECTION_SPECS: readonly CollectionSpec[] = [
   { slug: "public-domain", name: "Public-Domain Cinema", eyebrow: "Verified Heritage", description: "Films with verified public-domain status preserved for open viewing." },
   { slug: "open-access", name: "Open-Access Films", eyebrow: "Creative Commons", description: "Films explicitly released under Creative Commons and open licenses." },
   { slug: "independent", name: "Independent Cinema", eyebrow: "Indie Voices", description: "Independent productions and creator-released films." },
-  { slug: "recently-added", name: "Recently Added", eyebrow: "Library Additions", description: "Latest verified additions to the Cinemax catalog." },
+  { slug: "recently-added", name: "Recently Added", eyebrow: "Library Additions", description: "Latest verified additions to the cinemaxxx catalog." },
   { slug: "highest-rated", name: "Highest Rated", eyebrow: "8.0+ Acclaim", description: "Top-scoring titles across archival and open-access collections." },
   { slug: "coming-soon", name: "Coming Soon", eyebrow: "Upcoming Slate", description: "Confirmed upcoming theatrical and series releases with official metadata." },
   { slug: "hindi", name: "Hindi Cinema", eyebrow: "Popular Languages", description: "Pioneering Hindi classics, Bombay Talkies restorations, and upcoming Hindi releases." },
@@ -308,7 +308,7 @@ export function buildCollections<T extends MovieLike>(movies: T[], categories: C
         slug: cat.slug,
         name: cat.name,
         eyebrow: "Collection",
-        description: `${cat.name} titles in the Cinemax catalog.`,
+        description: `${cat.name} titles in the cinemaxxx catalog.`,
       });
     }
   }
@@ -339,7 +339,7 @@ export function buildAllCategoryCollections<T extends MovieLike>(movies: T[], ca
         slug: cat.slug,
         name: cat.name,
         eyebrow: "Collection",
-        description: `${cat.name} titles in the Cinemax catalog.`,
+        description: `${cat.name} titles in the cinemaxxx catalog.`,
       });
     }
   }

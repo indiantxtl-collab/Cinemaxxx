@@ -19,7 +19,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT="$(dirname "$SCRIPT_DIR")"
-CACHE="${CINEMAX_TOOLCHAIN:-$PROJECT/.toolchain}"
+CACHE="${CINEMAXXX_TOOLCHAIN:-$PROJECT/.toolchain}"
 OUT="${1:-$PROJECT/build}"
 WORK="$OUT/preview-classes"
 
@@ -35,7 +35,7 @@ mkdir -p "$WORK" "$OUT/preview"
 
 "$JAVA" -jar "$ECJ_JAR" -source 8 -target 8 -nowarn -encoding UTF-8 \
   -d "$WORK" \
-  "$PROJECT/app/src/main/java/com/cinemax/app/SplashMotion.java" \
+  "$PROJECT/app/src/main/java/com/cinemaxxx/app/SplashMotion.java" \
   "$SCRIPT_DIR/SplashPreview.java"
 
 "$JAVA" -Djava.awt.headless=true -cp "$WORK" SplashPreview "$PROJECT" "$OUT"

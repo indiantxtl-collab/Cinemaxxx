@@ -4,13 +4,13 @@ The Cinemax Android app is a thin, native shell around the existing production
 deployment. It does **not** fork, replace or duplicate anything: the same Next.js
 app, the same API routes, the same PostgreSQL database, the same studio/admin
 panel, the same authentication and the same playback pipeline run inside the app,
-served from **`https://cinemaxtv.space`**.
+served from the origin you configure with **`CINEMAXXX_SITE_URL`** (an HTTPS origin you control; the build refuses to start without it).
 
 ```
 android/
 ├── app/src/main/                 Android application module
 │   ├── AndroidManifest.xml       permissions, deep links, single activity
-│   ├── java/com/cinemax/app/     activity, theme, bridge, policy, splash (8 files)
+│   ├── java/com/cinemaxxx/app/     activity, theme, bridge, policy, splash (8 files)
 │   ├── assets/cinemax/           app-only presentation layer (CSS + runtime)
 │   └── res/                      adaptive + legacy icons, splash, themes, layout
 ├── build.sh                      Gradle-free build → signed APK
@@ -27,20 +27,20 @@ android/
 │   ├── shell-dom.test.mjs        the injected layer executed against a DOM
 │   ├── apk_check.py              manifest, resources, dex, signature, alignment
 │   └── axml.py                   binary AndroidManifest.xml reader
-└── dist/                         built artefacts (Cinemax-1.1.0.apk)
+└── dist/                         built artefacts (cinemaxxx-1.1.0.apk)
 ```
 
 `.github/workflows/android.yml` builds this same way in CI (no Gradle, no SDK
 manager): it fetches the pinned toolchain, installs jsdom, runs
 `android/build.sh`, then `android/tests/run-tests.sh`, and uploads
-`Cinemax-1.1.0.apk` plus its `.sha256` as the `cinemax-android-apk` artifact.
+`cinemaxxx-1.1.0.apk` plus its `.sha256` as the `cinemaxxx-android-apk` artifact.
 Every push and pull request builds it, and the workflow can be started by hand
 with *Run workflow*.
 
 ## Build
 
 ```bash
-bash android/build.sh              # build, sign and verify  →  android/dist/Cinemax-1.1.0.apk
+bash android/build.sh              # build, sign and verify  →  android/dist/cinemaxxx-1.1.0.apk
 bash android/build.sh --no-verify  # skip the verification pass
 bash android/tests/run-tests.sh    # build if needed, then run all checks
 bash android/tests/run-tests.sh --skip-build
@@ -59,19 +59,24 @@ The first build downloads a pinned toolchain into `android/.toolchain/`
 | Temurin 25 (jdk4py)    | PyPI `jdk4py`                            | JRE + `keytool`                 |
 
 No Gradle, no Android SDK manager, no Android Studio. Override any tool with
-`CINEMAX_JAVA`, `CINEMAX_KEYTOOL`, `CINEMAX_AAPT2`, `CINEMAX_ANDROID_JAR`,
-`CINEMAX_D8_JAR`, `CINEMAX_ECJ_JAR`, `CINEMAX_APKSIGNER_JAR`.
+`CINEMAXXX_JAVA`, `CINEMAXXX_KEYTOOL`, `CINEMAXXX_AAPT2`, `CINEMAXXX_ANDROID_JAR`,
+`CINEMAXXX_D8_JAR`, `CINEMAXXX_ECJ_JAR`, `CINEMAXXX_APKSIGNER_JAR`.
 
-**Signing.** `android/keystore/cinemax-release.keystore` (PKCS12, alias
-`cinemax`) holds the self-signed release key; store and key password default to
-`cinemax-release`. Override with `CINEMAX_KEYSTORE`, `CINEMAX_KEY_ALIAS`,
-`CINEMAX_KEY_PASS`, `CINEMAX_STORE_PASS`. **Replace this keystore with your own
-before publishing to Play** – the signing key decides upgrade identity:
+**Signing.** No release key ships in the repository, and no default password exists.
+A release build requires your own PKCS12 keystore and all four variables:
+`CINEMAXXX_KEYSTORE`, `CINEMAXXX_KEY_ALIAS`, `CINEMAXXX_KEY_PASS`,
+`CINEMAXXX_STORE_PASS`. The signing key decides upgrade identity, so keep it
+outside Git and back it up. `--debug` builds generate a throwaway debug key
+automatically and are for testing only.
 
 ```bash
-CINEMAX_KEYSTORE=/secure/cinemax.jks CINEMAX_KEY_ALIAS=cinemax \
-CINEMAX_KEY_PASS='…' CINEMAX_STORE_PASS='…' bash android/build.sh
+CINEMAXXX_KEYSTORE=/secure/cinemaxxx-release.p12 CINEMAXXX_KEY_ALIAS=YOUR_ALIAS \
+CINEMAXXX_KEY_PASS=… CINEMAXXX_STORE_PASS=… bash android/build.sh
 ```
+
+The repository's `.gitignore` excludes `android/keystore/*.keystore`, `*.p12` and
+`*.jks`. A previously tracked test keystore was removed from the working tree, but
+it remains in Git history and must be treated as compromised.
 
 Play requires an `.aab`; this project produces an installable, signed `.apk`.
 The same sources build an AAB with any standard Android toolchain (Android
@@ -81,7 +86,7 @@ module layout.
 ## Install
 
 ```bash
-adb install -r android/dist/Cinemax-1.1.0.apk
+adb install -r android/dist/cinemaxxx-1.1.0.apk
 ```
 
 Or copy the APK to the device and open it (enable *Install unknown apps* for the
@@ -92,10 +97,10 @@ file manager/browser you use). Requirements: **Android 7.0 (API 24) or newer**,
 
 | Concern | Behaviour |
 | --- | --- |
-| Content origin | `https://cinemaxtv.space` only – never localhost, never an emulator host, never a dev server. The URL is compiled into `classes.dex` and asserted by the tests. The previous deployment hostname (`cinemax-orpin.vercel.app`) is still accepted by the navigation policy so an earlier share link opens in the app. |
+| Content origin | The single HTTPS origin from `CINEMAXXX_SITE_URL` – never localhost, never an emulator host, never a dev server, and never an upstream CINEMAX host (the configuration tool rejects them). The URL is compiled into `classes.dex` and asserted by the tests. |
 | In-app navigation | The official host (and its `www` form), the previous deployment hostname and its `*.vercel.app` aliases stay in the WebView, so tabs, filters, search, details, watchlist, studio login, cookies and the whole player behave exactly as in a browser. |
 | External links | Any other domain, plus `mailto:`, `tel:`, `sms:`, `market:`, `intent:` and unknown schemes open in the matching system app. A lookalike host such as `evil-vercel.app.attacker.com` is sent out, not loaded. |
-| Deep links | `https://cinemaxtv.space/...` opens inside the app (`autoVerify`, see below). Re-opening from the launcher keeps the page you were on. |
+| Deep links | `<CINEMAXXX_SITE_URL>/...` opens inside the app (`autoVerify`, see below). Re-opening from the launcher keeps the page you were on. |
 | Back button | Fullscreen video → leave fullscreen; error screen → dismiss; otherwise WebView history → then "Press back again to exit". |
 | Rotation | The activity handles configuration changes itself, so rotating (or the player switching to landscape) never reloads the page. |
 | Edge to edge | API 30+ draws behind transparent status/navigation bars; the real insets are measured natively and published to the page as CSS variables, so the existing layout clears the status bar, gesture bar, cutout and rounded corners. Themed brand gradient shows in the very top and bottom strips. |
@@ -179,7 +184,7 @@ they can be refreshed at any time.)*
 | Memory | Sprites are dropped (never `recycle()`d, which could crash the render thread's last frame) when the splash is gone, and rebuilt if the veil is ever shown again. |
 | Reduced motion | The system animation scale is honoured: the splash shows the finished logo and hands over sooner instead of forcing motion. |
 | Any screen size | `SplashMotion.layout()` is the one size rule: the logo is exactly centred on both axes, 34% of the shorter screen edge, bounded by a 104 dp floor, a 176 dp boldness ceiling and a hard 40% cap, so the complete artwork always fits with a large margin on a 240×320 legacy phone, a tablet or a landscape phone. |
-| Profile | `bash android/tools/preview-splash.sh` renders the real timeline and geometry offline and prints the frame-to-frame change; on a device, `dumpsys gfxinfo com.cinemax.app framestats` during the reveal shows whether any frame ran long (see the device checklist). |
+| Profile | `bash android/tools/preview-splash.sh` renders the real timeline and geometry offline and prints the frame-to-frame change; on a device, `dumpsys gfxinfo com.cinemaxxx.app framestats` during the reveal shows whether any frame ran long (see the device checklist). |
 
 `SplashMotion.java` keeps the timeline (five layers, delays, durations, curves)
 and the geometry in pure arithmetic so both can be checked on a plain JVM —
@@ -196,8 +201,8 @@ regenerate the fingerprint and update that file:
 
 ```bash
 android/.toolchain/jdk/bin/keytool -list -v \
-  -keystore android/keystore/cinemax-release.keystore \
-  -alias cinemax -storepass cinemax-release | grep SHA256
+  -keystore "$CINEMAXXX_KEYSTORE" \
+  -alias "$CINEMAXXX_KEY_ALIAS" -storepass "$CINEMAXXX_STORE_PASS" | grep SHA256
 ```
 
 Then redeploy the site and reinstall the app.
@@ -210,7 +215,7 @@ bash android/tests/install-test-deps.sh      # jsdom for the DOM layer (cached)
 ```
 
 `run-tests.sh` runs four layers and exits non-zero on failure (it installs jsdom
-itself when it is missing and npm is available). `CINEMAX_REQUIRE_JSDOM=1` turns
+itself when it is missing and npm is available). `CINEMAXXX_REQUIRE_JSDOM=1` turns
 a missing jsdom/node into a failure instead of a skip — CI sets it, so the DOM
 layer can never silently disappear from a build:
 
@@ -263,12 +268,12 @@ intact.
 These checks need a real device or emulator with the production site reachable –
 they are the final gate:
 
-1. `adb install -r android/dist/Cinemax-1.1.0.apk`, then launch Cinemax.
+1. `adb install -r android/dist/cinemaxxx-1.1.0.apk`, then launch Cinemax.
 2. Watch the reveal: **the logo only** — dolly, rising blue/violet/pink light, one
    blue-to-pink band sweeping across the logo, the glow settling. Nothing else
    may appear: no rings, orbit lines, dots, streaks, taglines or spinners. It
    must cross-fade onto the home page with no black flash and no visible pause.
-   Confirm the hero, rails and every poster load from `cinemaxtv.space`
+   Confirm the hero, rails and every poster load from your configured `CINEMAXXX_SITE_URL` origin
    (no local content).
 3. Confirm the launch is continuous: the launcher window shows the same logo at
    the same size, and the reveal starts from it without a blink or a jump.
@@ -276,8 +281,8 @@ they are the final gate:
    during the reveal and confirm it is not cut short or restarted; with
    *Developer options → Animator duration scale = off* the splash must show the
    finished logo and hand over quickly.
-5. Profile it: `adb shell dumpsys gfxinfo com.cinemax.app framestats` straight
-   after a cold launch, and `adb shell dumpsys gfxinfo com.cinemax.app reset`
+5. Profile it: `adb shell dumpsys gfxinfo com.cinemaxxx.app framestats` straight
+   after a cold launch, and `adb shell dumpsys gfxinfo com.cinemaxxx.app reset`
    before a second launch. The reveal is one view with a handful of textured
    quads per frame, so it should not show long frames; a `chrome://inspect` trace
    from a debug build should show the WebView's first paint landing during the
@@ -285,7 +290,7 @@ they are the final gate:
 6. On a mid-range phone, rapidly scroll several rails and a long collection up
    and down, repeatedly, with a finger and with a fling; repeat on a throttled
    network. Touch input must stay immediate, the page must not jump, and
-   `dumpsys gfxinfo com.cinemax.app framestats` should show no long frames
+   `dumpsys gfxinfo com.cinemaxxx.app framestats` should show no long frames
    while scrolling. A trace from `chrome://inspect` (debug builds) should show
    the scroll frames free of style/layout/paint work besides the tiles coming in.
 7. Open a direct title and an adaptive HLS title. Verify the settings menu lists
@@ -319,7 +324,7 @@ they are the final gate:
   checklist can confirm 60 fps on real hardware.
 * The sandbox also has **no network route to the production deployment**, so the
   live hand-over to the real home page (the part that depends on
-  `cinemaxtv.space` answering) could not be exercised. The URL is
+  your configured origin answering) could not be exercised. The URL is
   compiled into the APK and asserted by the tests.
 * Playback of any licence-restricted source still depends on the deployment's
   own configuration (`TORRENT_*` gateway) exactly as on the web; the app adds

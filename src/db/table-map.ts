@@ -28,7 +28,22 @@ export const TABLE_COLUMN_MAP = {
     sortOrder: { column: "sort_order", legacy: ["sortOrder", "order"] },
     createdAt: { column: "created_at", legacy: ["createdAt"] },
   },
-  categories: {},
+  categories: {
+    sortOrder: { column: "sort_order", legacy: ["sortOrder"] },
+  },
+  channels: {
+    categoryId: { column: "category_id", legacy: [] },
+    streamUrl: { column: "stream_url", legacy: [] },
+    sortOrder: { column: "sort_order", legacy: [] },
+    createdAt: { column: "created_at", legacy: [] },
+    updatedAt: { column: "updated_at", legacy: [] },
+  },
+  channel_logos: {
+    channelId: { column: "channel_id", legacy: [] },
+    mimeType: { column: "mime_type", legacy: [] },
+    byteSize: { column: "byte_size", legacy: [] },
+    updatedAt: { column: "updated_at", legacy: [] },
+  },
   watchlist: {
     sessionId: { column: "session_id", legacy: ["sessionId"] },
     movieId: { column: "movie_id", legacy: ["movieId"] },

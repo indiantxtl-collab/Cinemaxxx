@@ -56,7 +56,7 @@ export default function DisclaimerPage() {
 
             <LegalSection id="no-affiliation" title="No affiliation, sponsorship or endorsement" kicker="Section 02">
               <p>
-                CINEMAX is an independent catalogue. It has no partnership, reseller,
+                cinemaxxx is an independent catalogue. It has no partnership, reseller,
                 distribution or licensing agreement with any of the services listed in it.
                 None of those companies has supplied content to this project under an
                 agreement, reviewed this website, approved its design, or endorsed it.
@@ -65,7 +65,7 @@ export default function DisclaimerPage() {
                 items={[
                   "A logo in the platform rail means “titles in this catalogue are available on this service”. It is a label, not a relationship.",
                   "A platform name in a title's availability row means the same thing, and is drawn from the studio's own record for that title.",
-                  "Nothing on this site may be read as a claim that CINEMAX is part of, owned by, sponsored by or approved by any of those companies.",
+                  "Nothing on this site may be read as a claim that cinemaxxx is part of, owned by, sponsored by or approved by any of those companies.",
                   "Where a service has merged or changed owner, the note on its card on /license records the change; no claim is made about the current status of any commercial relationship because none exists.",
                 ]}
               />
@@ -102,7 +102,7 @@ export default function DisclaimerPage() {
               <p>
                 Sharing a title produces a link to that title&apos;s page on this website,
                 plus — where the platform supports it — an image card built from the
-                title&apos;s own poster, its backdrop and the CINEMAX mark, and a reference to
+                title&apos;s own poster, its backdrop and the cinemaxxx mark, and a reference to
                 its trailer. A shared card is a preview of the page, not a copy of the film,
                 and a still image is never presented as playing video.
               </p>
@@ -118,7 +118,7 @@ export default function DisclaimerPage() {
             <LegalSection id="reviews" title="Ratings, reviews and third-party opinions" kicker="Section 06">
               <p>
                 Where a rating, review excerpt or certification appears, it is attributed to
-                whoever produced it. CINEMAX does not present a third party&apos;s opinion as
+                whoever produced it. cinemaxxx does not present a third party&apos;s opinion as
                 its own, and does not alter a score to suit its presentation. This project
                 does not publish its own reviews of titles.
               </p>

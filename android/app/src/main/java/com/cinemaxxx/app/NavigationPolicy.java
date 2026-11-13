@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 /**
  * Where a URL is allowed to be handled - pure logic, no Android types, so it can
@@ -17,13 +17,8 @@ public final class NavigationPolicy {
      * The app is a WebView around this one site, so this is also the host every
      * share link points at and the host declared for Android App Links.
      */
-    public static final String PRODUCTION_HOST = "cinemaxtv.space";
+    public static final String PRODUCTION_HOST = Deployment.HOST;
 
-    /** The deployment hostname used by earlier builds; still handled in-app. */
-    private static final String LEGACY_HOST = "cinemax-orpin.vercel.app";
-
-    /** Vercel preview aliases of the same deployment. */
-    private static final String VERCEL_SUFFIX = ".vercel.app";
 
     private NavigationPolicy() {
     }
@@ -120,9 +115,7 @@ public final class NavigationPolicy {
             return false;
         }
         return PRODUCTION_HOST.equals(normalizedHost)
-                || ("www." + PRODUCTION_HOST).equals(normalizedHost)
-                || LEGACY_HOST.equals(normalizedHost)
-                || normalizedHost.endsWith(VERCEL_SUFFIX);
+                || ("www." + PRODUCTION_HOST).equals(normalizedHost);
     }
 
     /**

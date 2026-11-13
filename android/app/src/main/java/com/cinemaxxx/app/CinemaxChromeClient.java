@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.view.View;
 import android.webkit.PermissionRequest;

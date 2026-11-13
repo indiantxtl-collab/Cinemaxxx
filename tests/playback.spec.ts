@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { createPlaybackMovie, preparePage, servePlaybackFixtures, expectNoOverflow, dismissPlayer, ensureWindowedPlayer, revealPlayerControls } from "./helpers";
+import { createPlaybackMovie, preparePage, servePlaybackFixtures, expectNoOverflow, dismissPlayer, ensureWindowedPlayer, revealPlayerControls, testAdminCredentials } from "./helpers";
 
 test.beforeEach(async ({ page }) => { await preparePage(page); await servePlaybackFixtures(page); });
 
@@ -182,12 +182,13 @@ test("unavailable media shows recoverable errors and Escape returns to details",
 
 test("studio authentication and all existing management tabs remain available", async ({ page }) => {
   await page.goto("/gate-keeper", { waitUntil: "domcontentloaded" });
-  await page.getByRole("textbox", { name: "Email", exact: true }).fill(process.env.ADMIN_EMAIL || "admin@cinemax.com");
-  await page.getByLabel("Password", { exact: true }).fill(process.env.ADMIN_PASSWORD || "Admin@123");
+  const credentials = testAdminCredentials();
+  await page.getByRole("textbox", { name: "Email", exact: true }).fill(credentials.email);
+  await page.getByLabel("Password", { exact: true }).fill(credentials.password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/gate-keeper\/dashboard/);
-  await expect(page.getByRole("heading", { name: "Cinemax studio", exact: true })).toBeVisible();
-  for (const [tab, heading] of [["movies", /Library/], ["slides", /Hero Slides/], ["categories", /Categories/], ["lists", /Saved Lists/]] as const) {
+  await expect(page.getByRole("heading", { name: "cinemaxxx studio", exact: true })).toBeVisible();
+  for (const [tab, heading] of [["movies", /Library/], ["slides", /Hero Slides/], ["categories", /Categories/], ["channels", /Channels/], ["lists", /Saved Lists/]] as const) {
     await page.getByRole("button", { name: tab, exact: true }).click();
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     await expectNoOverflow(page);

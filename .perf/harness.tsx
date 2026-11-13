@@ -149,10 +149,10 @@ async function run() {
     logo: (button.querySelector("img") as HTMLImageElement | null)?.getAttribute("src") ?? "",
     disc: Boolean(button.querySelector(".platform-orbit-disc")),
   }));
-  const cinemaxDisc = railDiscs.find((button) => button.querySelector(".platform-orbit-name")?.textContent === "CINEMAX");
+  const cinemaxDisc = railDiscs.find((button) => button.querySelector(".platform-orbit-name")?.textContent === "CINEMAXXX");
 
   const pickButtons = [...host.querySelectorAll(".platform-pick")];
-  const cinemaxPick = pickButtons.find((button) => button.textContent?.includes("CINEMAX")) as HTMLButtonElement | undefined;
+  const cinemaxPick = pickButtons.find((button) => button.textContent?.includes("CINEMAXXX")) as HTMLButtonElement | undefined;
   const pickedBefore = host.querySelector("[data-picked]")?.getAttribute("data-picked") ?? "";
   const cinemaxPickState = {
     pressedBefore: cinemaxPick?.getAttribute("aria-pressed") ?? null,

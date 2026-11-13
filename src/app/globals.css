@@ -2111,3 +2111,33 @@ html[data-cinemax-scrolling="true"] .shimmer::after { animation-play-state: paus
 html[data-cinemax-app="android"] .app-promo {
   display: none !important;
 }
+
+/* Additive studio controls reuse the existing Prism surfaces and typography. */
+.studio-small-button { display: inline-flex; align-items: center; justify-content: center; width: 34px; min-height: 34px; border: 1px solid rgba(255,255,255,.08); border-radius: 8px; background: rgba(255,255,255,.05); color: var(--text-soft); cursor: pointer; font-size: 12px; font-weight: 700; }
+.studio-small-button:disabled { opacity: .4; cursor: default; }
+.studio-record-row { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(255,255,255,.06); border-radius: 14px; background: rgba(20,20,20,.6); }
+.studio-channel-logo { display: grid; place-items: center; width: 48px; height: 48px; flex-shrink: 0; object-fit: contain; border-radius: 8px; background: #111; color: var(--text-dim); font-size: 11px; }
+.studio-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.studio-field-help { margin-top: 6px; color: var(--text-dim); font-size: 10px; line-height: 1.5; }
+.studio-empty { padding: 40px 0; text-align: center; color: var(--text-dim); font-size: 13px; font-weight: 600; }
+@media (max-width: 560px) {
+  .studio-record-row { flex-wrap: wrap; }
+  .studio-form-grid { grid-template-columns: 1fr; }
+  .studio-dashboard .detail-panel { padding: 18px; }
+}
+
+/* Channel browsing is an additive section using the existing collection tile. */
+.channel-section { margin-block: 24px; }
+.channel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+.channel-tile { width: 100%; min-height: 130px; border: 1px solid var(--line); cursor: pointer; font: inherit; text-align: left; }
+.channel-tile:disabled { opacity: .6; cursor: wait; }
+.channel-logo { position: absolute; inset: 14px 14px 42px; width: calc(100% - 28px); height: calc(100% - 56px); object-fit: contain; }
+.channel-logo-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-dim); }
+.channel-logo-fallback svg { width: 34px; height: 34px; }
+@media (max-width: 400px) { .channel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
+
+/* First-entry declaration: the studio's existing centered lockup and buttons. */
+.age-declaration { position: fixed; inset: 0; z-index: 25000; overflow-y: auto; }
+.age-declaration-actions { display: flex; gap: 12px; margin-top: 28px; }
+.age-declaration-actions .cinematic-button { flex: 1; }
+.age-declaration .age-declaration-note { margin-top: 22px; font-size: 11px; line-height: 1.65; color: var(--text-dim); }

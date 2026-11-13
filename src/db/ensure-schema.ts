@@ -101,12 +101,72 @@ const TABLES: Record<string, { createSql: string; columns: readonly ColumnSpec[]
       CREATE TABLE IF NOT EXISTS "categories" (
         "id" serial PRIMARY KEY,
         "name" varchar(100) NOT NULL DEFAULT '',
-        "slug" varchar(100) NOT NULL UNIQUE
+        "slug" varchar(100) NOT NULL UNIQUE,
+        "sort_order" integer NOT NULL DEFAULT 0,
+        "enabled" boolean NOT NULL DEFAULT true
       );
     `,
     columns: [
       { column: "name", sqlType: "varchar(100) NOT NULL DEFAULT ''" },
       { column: "slug", sqlType: "varchar(100) NOT NULL" },
+      { column: "sort_order", sqlType: "integer NOT NULL DEFAULT 0", legacy: ["sortOrder"] },
+      { column: "enabled", sqlType: "boolean NOT NULL DEFAULT true" },
+    ],
+  },
+  channels: {
+    createSql: `
+      CREATE TABLE IF NOT EXISTS channels (
+  id serial PRIMARY KEY,
+  category_id integer NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+  name varchar(200) NOT NULL,
+  description text NOT NULL DEFAULT '',
+  stream_url text NOT NULL,
+  sort_order integer NOT NULL DEFAULT 0,
+  enabled boolean NOT NULL DEFAULT true,
+  created_at timestamp NOT NULL DEFAULT now(),
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT channels_name_check CHECK (length(btrim(name)) > 0),
+  CONSTRAINT channels_stream_url_check CHECK (
+    length(stream_url) <= 4096 AND stream_url ~ '^https?://[^[:space:]]+$'
+  ),
+  CONSTRAINT channels_sort_order_check CHECK (sort_order >= 0)
+);
+    `,
+    columns: [
+      { column: "category_id", sqlType: "integer NOT NULL" },
+      { column: "name", sqlType: "varchar(200) NOT NULL" },
+      { column: "description", sqlType: "text NOT NULL DEFAULT ''" },
+      { column: "stream_url", sqlType: "text NOT NULL" },
+      { column: "sort_order", sqlType: "integer NOT NULL DEFAULT 0" },
+      { column: "enabled", sqlType: "boolean NOT NULL DEFAULT true" },
+      { column: "created_at", sqlType: "timestamp NOT NULL DEFAULT now()" },
+      { column: "updated_at", sqlType: "timestamp NOT NULL DEFAULT now()" },
+    ],
+  },
+  channel_logos: {
+    createSql: `
+      CREATE TABLE IF NOT EXISTS channel_logos (
+  channel_id integer PRIMARY KEY REFERENCES channels(id) ON DELETE CASCADE,
+  content bytea NOT NULL,
+  mime_type varchar(32) NOT NULL,
+  byte_size integer NOT NULL,
+  sha256 varchar(64) NOT NULL,
+  updated_at timestamp NOT NULL DEFAULT now(),
+  CONSTRAINT channel_logos_mime_type_check CHECK (
+    mime_type IN ('image/png', 'image/jpeg', 'image/webp', 'image/gif')
+  ),
+  CONSTRAINT channel_logos_byte_size_check CHECK (
+    byte_size > 0 AND byte_size <= 2097152 AND octet_length(content) = byte_size
+  )
+);
+    `,
+    columns: [
+      { column: "channel_id", sqlType: "integer PRIMARY KEY" },
+      { column: "content", sqlType: "bytea NOT NULL" },
+      { column: "mime_type", sqlType: "varchar(32) NOT NULL" },
+      { column: "byte_size", sqlType: "integer NOT NULL" },
+      { column: "sha256", sqlType: "varchar(64) NOT NULL" },
+      { column: "updated_at", sqlType: "timestamp NOT NULL DEFAULT now()" },
     ],
   },
   watchlist: {
@@ -211,6 +271,20 @@ async function reconcileTable(
   return { created, added, renamed, backfilled, columns: [...existing].sort() };
 }
 
+async function ensureCategoryConstraints() {
+  await getDb().execute(sql.raw(`DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'categories_name_check' AND conrelid = 'categories'::regclass) THEN
+    ALTER TABLE categories ADD CONSTRAINT categories_name_check CHECK (length(btrim(name)) > 0);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'categories_slug_check' AND conrelid = 'categories'::regclass) THEN
+    ALTER TABLE categories ADD CONSTRAINT categories_slug_check CHECK (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$');
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'categories_sort_order_check' AND conrelid = 'categories'::regclass) THEN
+    ALTER TABLE categories ADD CONSTRAINT categories_sort_order_check CHECK (sort_order >= 0);
+  END IF;
+END $$;`));
+}
+
 async function ensureIndexes() {
   const db = getDb();
   const statements = [
@@ -224,6 +298,9 @@ async function ensureIndexes() {
     `CREATE INDEX IF NOT EXISTS "idx_slides_active_sort" ON "slides" ("active", "sort_order")`,
     // Latest-first hero ordering (db/slide-order.ts).
     `CREATE INDEX IF NOT EXISTS "idx_slides_created_latest" ON "slides" ("created_at" DESC NULLS LAST, "sort_order", "id" DESC)`,
+    `CREATE INDEX IF NOT EXISTS "idx_categories_enabled_sort" ON "categories" ("enabled", "sort_order", "id")`,
+    `CREATE INDEX IF NOT EXISTS "idx_channels_category_enabled_sort" ON "channels" ("category_id", "enabled", "sort_order", "id")`,
+    `CREATE INDEX IF NOT EXISTS "idx_channels_enabled_sort" ON "channels" ("enabled", "sort_order", "id")`,
   ];
   for (const stmt of statements) {
     try {
@@ -241,6 +318,7 @@ export function ensureSchema(force = false): Promise<SchemaReport> {
       for (const [name, spec] of Object.entries(TABLES)) {
         tables[name] = await reconcileTable(name, spec);
       }
+      await ensureCategoryConstraints();
       await ensureIndexes();
       const report: SchemaReport = { ok: true, error: null, tables };
       latestReport = report;

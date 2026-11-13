@@ -17,10 +17,10 @@ import type { PlatformId } from "@/lib/platforms";
 export const LEGAL_REVIEWED = "1 November 2026";
 
 export const LEGAL_OWNER = {
-  name: "CINEMAX",
+  name: "cinemaxxx",
   /** Neutral, factual statement about this project - no claim is made beyond it. */
   summary:
-    "CINEMAX is an independent movie and series catalogue project. It is not operated by, licensed by, or affiliated with any of the streaming services listed on this page.",
+    "cinemaxxx is an independent movie and series catalogue project. It is not operated by, licensed by, or affiliated with any of the streaming services listed on this page.",
   contact: "Use the studio contact details published with this deployment, or open an issue in the project repository.",
 } as const;
 
@@ -55,7 +55,7 @@ export const LEGAL_PAGES: readonly LegalPageMeta[] = [
     title: "Copyright & Intellectual Property",
     eyebrow: "Website documentation",
     description:
-      "What is original to CINEMAX, what belongs to third parties, how to report a rights concern, and the notice-and-takedown procedure used for reported material.",
+      "What is original to cinemaxxx, what belongs to third parties, how to report a rights concern, and the notice-and-takedown procedure used for reported material.",
     reviewed: LEGAL_REVIEWED,
   },
   {
@@ -235,8 +235,8 @@ export const PLATFORM_BRAND_NOTICES: readonly PlatformBrandNotice[] = [
     id: "cinemax",
     service: "CINEMAX",
     owner: "Home Box Office, Inc. (Warner Bros. Discovery, Inc.)",
-    use: "Official Cinemax brand artwork, used nominatively to label titles available on the Cinemax network.",
-    note: "This is a third-party mark and is treated as one. It is deliberately different from this project's own CINEMAX identity: the application's emblem, wordmark and app icon are original artwork belonging to this project (see /copyright) and are not the Cinemax network's logo. Warner Bros. Discovery revived the Cinemax brand for its linear channels in September 2025.",
+    use: "Official cinemaxxx brand artwork, used nominatively to label titles available on the cinemaxxx network.",
+    note: "This is a third-party mark and is treated as one. It is deliberately different from this project's own cinemaxxx identity: the application's emblem, wordmark and app icon are original artwork belonging to this project (see /copyright) and are not the cinemaxxx network's logo. Warner Bros. Discovery revived the cinemaxxx brand for its linear channels in September 2025.",
   },
 ];
 
@@ -383,7 +383,7 @@ export const FONT_ATTRIBUTIONS: readonly FontAttribution[] = [
     licence: "SIL Open Font License 1.1",
     licenceUrl: "https://openfontlicense.org",
     file: "src/app/fonts/OUTFIT-LICENSE.txt (also packaged in the Android app at assets/cinemax/fonts/)",
-    use: "Display face: headings, the CINEMAX wordmark and the native splash wordmark.",
+    use: "Display face: headings, the cinemaxxx wordmark and the native splash wordmark.",
   },
   {
     family: "Manrope",
@@ -396,11 +396,11 @@ export const FONT_ATTRIBUTIONS: readonly FontAttribution[] = [
 ];
 
 export const IMAGE_NOTES = [
-  "Poster and backdrop artwork for catalogue titles is supplied by the studio that adds the title, or referenced from an image host that the studio is licensed to use. CINEMAX does not claim ownership of that artwork.",
+  "Poster and backdrop artwork for catalogue titles is supplied by the studio that adds the title, or referenced from an image host that the studio is licensed to use. cinemaxxx does not claim ownership of that artwork.",
   "Where a title uses artwork hosted by The Movie Database (image.tmdb.org), it is displayed at a reduced size through TMDB's public image service and remains the property of the film's rights holders, as listed by TMDB. TMDB's own terms apply to that service; this website is not endorsed or certified by TMDB.",
   "Artwork is requested lazily, at a size appropriate for the container, and is never modified, recoloured, cropped into a different aspect ratio, or overlayed with a filter. The one exception is the small number of brand logos documented above, which are scaled only.",
   "The platform marks in public/platforms are the platforms' own artwork, sourced from the third-party brand libraries recorded on /attributions. They are not redrawn, recoloured or substituted with text.",
-  "The CINEMAX emblem, wordmark lockup and app icon are original vector artwork created for this project and are used under this project's own copyright.",
+  "The cinemaxxx emblem, wordmark lockup and app icon are original vector artwork created for this project and are used under this project's own copyright.",
   "The Android application icon, splash artwork and system notification assets are generated from that same original emblem.",
 ] as const;
 
@@ -410,8 +410,8 @@ export const ICON_NOTES = [
 ] as const;
 
 export const VIDEO_NOTES = [
-  "CINEMAX does not sell, host or redistribute commercial titles. Playback happens in one of two ways: a source the studio has recorded as licensed or public domain, or an official external player belonging to the platform that holds the rights.",
+  "cinemaxxx does not sell, host or redistribute commercial titles. Playback happens in one of two ways: a source the studio has recorded as licensed or public domain, or an official external player belonging to the platform that holds the rights.",
   "Trailers are only ever the ones the studio has attached to a title. They may be a direct video file, an HLS or DASH stream, or an official YouTube or Vimeo embed played through that provider's own player.",
-  "Where a title is available on an external platform, the app hand off to that platform's own player and page; the stream itself never passes through CINEMAX.",
+  "Where a title is available on an external platform, the app hand off to that platform's own player and page; the stream itself never passes through cinemaxxx.",
   "If you believe a title, trailer or image in the catalogue infringes your rights, see /copyright for the reporting route.",
 ] as const;

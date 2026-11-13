@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -32,7 +32,7 @@ import java.io.FileNotFoundException;
 public class ShareFileProvider extends ContentProvider {
 
     /** Authority declared in AndroidManifest.xml. */
-    public static final String AUTHORITY = "com.cinemax.app.share.files";
+    public static final String AUTHORITY = "com.cinemaxxx.app.share.files";
 
     /** Directory under the app cache that holds shareable files. */
     static final String DIRECTORY = "share";

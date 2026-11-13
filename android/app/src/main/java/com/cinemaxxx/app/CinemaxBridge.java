@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.os.Build;
 import android.webkit.JavascriptInterface;
@@ -96,6 +96,17 @@ public class CinemaxBridge {
         activity.shareTitle(title, text, url, imageUrl, videoUrl);
     }
 
+    /** A declined first-entry declaration closes the task; it never opens the site. */
+    @JavascriptInterface
+    public void exitApp() {
+        activity.runOnUi(new Runnable() {
+            @Override
+            public void run() {
+                activity.exitApplication();
+            }
+        });
+    }
+
     @JavascriptInterface
     public void toast(final String message) {
         activity.showToast(message);
@@ -103,6 +114,6 @@ public class CinemaxBridge {
 
     @JavascriptInterface
     public String deviceInfo() {
-        return "Cinemax Android " + APP_VERSION + " (API " + Build.VERSION.SDK_INT + ")";
+        return "cinemaxxx Android " + APP_VERSION + " (API " + Build.VERSION.SDK_INT + ")";
     }
 }

@@ -44,7 +44,7 @@
         android:layout_height="match_parent"
         android:background="@color/cinemax_ink">
 
-        <com.cinemax.app.CinemaxSplashView
+        <com.cinemaxxx.app.CinemaxSplashView
             android:id="@+id/cinemax_splash_stage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

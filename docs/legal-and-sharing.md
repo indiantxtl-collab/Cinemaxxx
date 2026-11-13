@@ -94,7 +94,7 @@ to those routes.
 
 | Concern | Behaviour |
 | ------- | --------- |
-| Origin | `https://cinemaxtv.space` — the official domain. A share made from a deployment hostname (`*.vercel.app`) or a local server is rewritten to it |
+| Origin | `NEXT_PUBLIC_SITE_URL` (`CINEMAXXX_SITE_URL` for Android) — this deployment's own HTTPS origin. Shares are generated against it; local or foreign hosts are never used as the share destination |
 | Link | `/share/<id>` — a page that actually shows what was shared; this is the **only** URL a share carries |
 | Card | the receiving app builds one preview card from that page's own `og:`/`twitter:` tags (title, year · genre, synopsis, poster, the generated 1200×630 image) |
 | Text | the title's **description only** — no repeated title, no raw address, no trailer line, so nothing renders a second card |

@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -158,7 +158,7 @@ public final class CinemaxSplashView extends View {
     private static final float BAND_PINK_OVERLAP = 0.06f;
 
     /** The wordmark: brand typeface, brand tracking, no effects. */
-    private static final String WORDMARK = "CINEMAX";
+    private static final String WORDMARK = "cinemaxxx";
     private static final String WORDMARK_ASSET = "cinemax/fonts/outfit-semibold.ttf";
     private static final String WORDMARK_FALLBACK_FAMILY = "sans-serif-medium";
     private static final int WORDMARK_COLOUR = 0xFFF7F4FF;

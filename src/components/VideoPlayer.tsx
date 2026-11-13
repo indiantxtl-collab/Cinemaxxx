@@ -46,7 +46,7 @@ const ERROR_COPY: Record<PlaybackErrorKind, { title: string; copy: string }> = {
   },
   source: {
     title: "The video server isn’t responding",
-    copy: "Cinemax connected directly to the source, but it stopped sending data. The hosting server may be down or overloaded. Try again, or return to the title page.",
+    copy: "cinemaxxx connected directly to the source, but it stopped sending data. The hosting server may be down or overloaded. Try again, or return to the title page.",
   },
   format: {
     title: "This video can’t be played here",

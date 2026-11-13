@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 /**
  * The native Cinemax launch reveal, expressed as pure arithmetic.

@@ -2,7 +2,7 @@
  * Offline preview of the native Cinemax splash - no device, no emulator.
  *
  * It renders the real choreography: the timeline, the curves and the viewport
- * geometry all come from com.cinemax.app.SplashMotion (the same class the app
+ * geometry all come from com.cinemaxxx.app.SplashMotion (the same class the app
  * runs), and the logo is rasterised from the same drawable path data the app
  * ships (app/src/main/res/drawable/cinemax_emblem.xml). The drawing order and
  * the transforms mirror CinemaxSplashView.onDraw, using the same pre-rendered
@@ -21,7 +21,7 @@
  *   bash android/tools/preview-splash.sh
  *   (or, by hand:)
  *   java -jar android/.toolchain/lib/ecj.jar -source 8 -target 8 \
- *     -d <out>/classes android/app/src/main/java/com/cinemax/app/SplashMotion.java \
+ *     -d <out>/classes android/app/src/main/java/com/cinemaxxx/app/SplashMotion.java \
  *     android/tools/SplashPreview.java
  *   java -Djava.awt.headless=true -cp <out>/classes SplashPreview android <out>
  *
@@ -29,7 +29,7 @@
  * <out>/preview/splash-screens.png (the settled frame on different screens).
  */
 
-import com.cinemax.app.SplashMotion;
+import com.cinemaxxx.app.SplashMotion;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -98,7 +98,7 @@ public final class SplashPreview {
     private static final int BASE_TOP = 0x24122A6B;
     private static final int BASE_MID = 0x0F16123A;
     private static final int BASE_BOTTOM = 0x1C3A1140;
-    private static final String WORDMARK = "CINEMAX";
+    private static final String WORDMARK = "cinemaxxx";
     private static final int WORDMARK_COLOUR = 0xFFF7F4FF;
     private static final float WORDMARK_RISE_EM = 0.34f;
 

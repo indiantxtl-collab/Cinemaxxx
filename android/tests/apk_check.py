@@ -4,12 +4,14 @@
 Independent of the build script: it re-opens the finished APK and asserts the
 properties that make it a real, installable Android app.
 
-Usage: python3 android/tests/apk_check.py android/dist/Cinemax-1.1.0.apk <toolchain-dir>
+Usage: python3 android/tests/apk_check.py android/dist/cinemaxxx-1.1.0.apk <toolchain-dir>
 """
 from __future__ import annotations
 
 import hashlib
+import json
 import os
+from pathlib import Path
 import struct
 import subprocess
 import sys
@@ -151,20 +153,25 @@ def main() -> int:
         check(actual == expected, f"{relative} inside the APK matches the source file")
 
     section("manifest")
+    deployment_file = Path(root) / "build" / "deployment.json"
+    if not deployment_file.is_file():
+        raise SystemExit("Build with CINEMAXXX_SITE_URL before checking the APK")
+    deployment = json.loads(deployment_file.read_text())
+    host = deployment["host"]
     badging = run([aapt2, "dump", "badging", apk])
-    check("package: name='com.cinemax.app'" in badging, "package id is com.cinemax.app")
+    check("package: name='com.cinemaxxx.app'" in badging, "package id is com.cinemaxxx.app")
     check("versionCode='2'" in badging, "versionCode is 2")
     check("versionName='1.1.0'" in badging, "versionName is 1.1.0")
-    check("application-label:'Cinemax'" in badging, "app label is Cinemax")
+    check("application-label:'cinemaxxx'" in badging, "app label is cinemaxxx")
     check("sdkVersion:'24'" in badging, "minSdkVersion is 24 (Android 7.0)")
     check("targetSdkVersion:'34'" in badging, "targetSdkVersion is 34 (Android 14)")
-    check("launchable-activity: name='com.cinemax.app.MainActivity'" in badging, "MainActivity is the launcher activity")
+    check("launchable-activity: name='com.cinemaxxx.app.MainActivity'" in badging, "MainActivity is the launcher activity")
     check("uses-permission: name='android.permission.INTERNET'" in badging, "INTERNET permission is declared")
     check("uses-permission: name='android.permission.ACCESS_NETWORK_STATE'" in badging, "network-state permission is declared")
 
     # Parsed from the compiled binary XML - exactly what the device reads.
     manifest = parse_axml(load_manifest(apk))
-    check(manifest.attr("package", namespace="") == "com.cinemax.app", "compiled manifest declares the package")
+    check(manifest.attr("package", namespace="") == "com.cinemaxxx.app", "compiled manifest declares the package")
     check(manifest.attr("versionName") == "1.1.0", "compiled manifest declares the version name")
 
     application = manifest.find("application")
@@ -175,7 +182,7 @@ def main() -> int:
 
     activity = application.find("activity") if application else None
     check(activity is not None, "a single activity hosts the web app")
-    check(activity.attr("name") == "com.cinemax.app.MainActivity", "the activity is MainActivity")
+    check(activity.attr("name") == "com.cinemaxxx.app.MainActivity", "the activity is MainActivity")
     check(activity.attr("exported") == "true", "the launcher activity is exported")
     check(activity.attr("launchMode") == "2", "launchMode singleTask keeps one app task")
     check(activity.attr("windowSoftInputMode") == "0x10", "adjustResize keeps inputs above the keyboard")
@@ -194,11 +201,11 @@ def main() -> int:
     production_filter = [f for f in filters if f.attr("autoVerify") == "true"]
     check(len(production_filter) == 1, "the production deep link is verified automatically")
     check(
-        any(d.attr("host") == "cinemaxtv.space" and d.attr("scheme") == "https" for d in data),
+        any(d.attr("host") == host and d.attr("scheme") == "https" for d in data),
         "deep links target the official host over https",
     )
     check(
-        any(d.attr("host") == "www.cinemaxtv.space" and d.attr("scheme") == "https" for d in data),
+        any(d.attr("host") == "www." + host and d.attr("scheme") == "https" for d in data),
         "the www form of the official host is a deep link too",
     )
     permissions = {element.attr("name") for element in manifest.find_all("uses-permission")}
@@ -257,9 +264,9 @@ def main() -> int:
                 collect(child)
 
         collect(layout)
-        check("com.cinemax.app.CinemaxSplashView" in element_names,
+        check("com.cinemaxxx.app.CinemaxSplashView" in element_names,
               "the splashed layout inflates the layered native reveal view")
-        check(element_names.count("com.cinemax.app.CinemaxSplashView") == 1,
+        check(element_names.count("com.cinemaxxx.app.CinemaxSplashView") == 1,
               "exactly one reveal canvas is inflated")
         check("FrameLayout" in element_names and "ProgressBar" in element_names,
               "the shell layout (host, progress, error surface) is intact")
@@ -290,19 +297,20 @@ def main() -> int:
     section("dex content")
     dex = read_entry(apk, "classes.dex")
     for descriptor in (
-        b"Lcom/cinemax/app/MainActivity;",
-        b"Lcom/cinemax/app/CinemaxWebViewClient;",
-        b"Lcom/cinemax/app/CinemaxChromeClient;",
-        b"Lcom/cinemax/app/CinemaxBridge;",
-        b"Lcom/cinemax/app/NavigationPolicy;",
-        b"Lcom/cinemax/app/AppTheme;",
-        b"Lcom/cinemax/app/CinemaxSplashView;",
-        b"Lcom/cinemax/app/SplashMotion;",
-        b"Lcom/cinemax/app/ShareLauncher;",
-        b"Lcom/cinemax/app/ShareFileProvider;",
+        b"Lcom/cinemaxxx/app/MainActivity;",
+        b"Lcom/cinemaxxx/app/CinemaxWebViewClient;",
+        b"Lcom/cinemaxxx/app/CinemaxChromeClient;",
+        b"Lcom/cinemaxxx/app/CinemaxBridge;",
+        b"Lcom/cinemaxxx/app/NavigationPolicy;",
+        b"Lcom/cinemaxxx/app/AppTheme;",
+        b"Lcom/cinemaxxx/app/CinemaxSplashView;",
+        b"Lcom/cinemaxxx/app/SplashMotion;",
+        b"Lcom/cinemaxxx/app/ShareLauncher;",
+        b"Lcom/cinemaxxx/app/ShareFileProvider;",
     ):
         check(descriptor in dex, f"{descriptor.decode()} is in classes.dex")
-    check(b"cinemax-orpin.vercel.app" in dex, "the production URL is compiled into the APK")
+    check(("https://" + host + "/").encode() in dex, "the configured production URL is compiled into the APK")
+    check(b"cinemax-orpin.vercel.app" not in dex and b"cinemaxtv.space" not in dex, "no original deployment URL is compiled into the fork")
     check(b"CinemaxNative" in dex, "the JavaScript bridge name is present")
     check(b"__cinemaxInsets" in dex, "the inset hand-off to the page is present")
 
@@ -311,7 +319,7 @@ def main() -> int:
     check(b"android.intent.action.SEND" in dex and b"android.intent.action.SEND_MULTIPLE" in dex,
           "the share intents are ACTION_SEND / ACTION_SEND_MULTIPLE")
     check(b"android.intent.extra.STREAM" in dex, "shares attach real streams (EXTRA_STREAM)")
-    check(b"cinemax.app.share.files" in dex, "the share files are served by the content provider")
+    check(b"com.cinemaxxx.app.share.files" in dex, "the share files are served by the content provider")
     check(b"file://" not in dex, "no file:// URI is built for a share (Android 7 forbids it)")
 
     section("dex integrity (what ART parses at install time)")
@@ -367,7 +375,7 @@ def main() -> int:
         check("Verifies" in verify, "apksigner verifies the APK")
         check("APK Signature Scheme v2" in verify, "v2 signature scheme is used")
         check("APK Signature Scheme v3): true" in verify, "v3 signature scheme is used")
-        check("signer #1 certificate DN: CN=Cinemax" in verify.lower() or "CN=Cinemax" in verify, "signed by the Cinemax release key")
+        check("signer #1 certificate dn: cn=cinemaxxx" in verify.lower(), "signed by the cinemaxxx release key")
     else:
         print("  skip apksigner (not found in the toolchain)")
 

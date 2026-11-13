@@ -45,12 +45,12 @@ if (!scriptPath || !shellPath) {
 
 const jsdomModule = loadJsdom();
 if (!jsdomModule) {
-  // CI sets CINEMAX_REQUIRE_JSDOM=1 so a missing dependency can never turn this
+  // CI sets CINEMAXXX_REQUIRE_JSDOM=1 so a missing dependency can never turn this
   // layer into a silent pass.
-  const required = process.env.CINEMAX_REQUIRE_JSDOM === "1";
+  const required = process.env.CINEMAXXX_REQUIRE_JSDOM === "1";
   console.log(
     required
-      ? "FAIL  jsdom is required (CINEMAX_REQUIRE_JSDOM=1) but is not installed - run android/tests/install-test-deps.sh"
+      ? "FAIL  jsdom is required (CINEMAXXX_REQUIRE_JSDOM=1) but is not installed - run android/tests/install-test-deps.sh"
       : "SKIP  jsdom is not installed (run android/tests/install-test-deps.sh)"
   );
   process.exit(required ? 1 : 0);

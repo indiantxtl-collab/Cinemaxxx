@@ -53,7 +53,11 @@ function section(name) {
   console.log(`\n== ${name}`);
 }
 
-const ORIGIN = "https://cinemaxtv.space";
+const ORIGIN = (() => {
+  const value = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!value) throw new Error("Set NEXT_PUBLIC_SITE_URL to the test deployment origin; no upstream domain is assumed.");
+  return new URL(value).origin;
+})();
 
 const movie = {
   id: 42,
@@ -95,6 +99,7 @@ function load({ bridge = null, share = null, canShare = null, clipboard = null, 
   }
 
   const sandbox = {
+    process: { env: { NEXT_PUBLIC_SITE_URL: ORIGIN } },
     window: windowObject,
     navigator: navigatorObject,
     fetch:
@@ -163,7 +168,7 @@ section("What a share carries");
   const { api } = load();
   const payload = api.buildSharePayload(movie, ORIGIN);
 
-  check(payload.title === "Dune: Part Two on CINEMAX", "the subject names the title and CINEMAX", payload.title);
+  check(payload.title === "Dune: Part Two on cinemaxxx", "the subject names the title and CINEMAX", payload.title);
   check(payload.url === `${ORIGIN}/share/42`, "the link opens the share landing page", payload.url);
   check(payload.imageUrl === `${ORIGIN}/api/share/card/42`, "the preview image is the generated card", payload.imageUrl);
   check(
@@ -190,7 +195,7 @@ section("What a share carries");
   check(!/example\.com\/poster/.test(payload.imageUrl), "the payload never falls back to raw artwork as the preview");
 
   const sparse = api.buildSharePayload({ id: 7, title: "Untitled record" }, ORIGIN);
-  check(sparse.text === "Watch Untitled record on CINEMAX.", "a record without a description still reads as a sentence", sparse.text);
+  check(sparse.text === "Watch Untitled record on cinemaxxx.", "a record without a description still reads as a sentence", sparse.text);
   check(!sparse.text.includes("()"), "missing year and genre leave no empty brackets");
 
   const long = api.buildSharePayload({ ...movie, description: "x".repeat(400) }, ORIGIN);
@@ -216,7 +221,7 @@ section("Android shell — native share sheet");
   check(outcome === "shared", "a bridge share reports success", outcome);
   check(calls.bridge.length === 1, "the bridge is called exactly once");
   const [title, text, url, imageUrl, videoUrl] = calls.bridge[0] ?? [];
-  check(title === "Dune: Part Two on CINEMAX", "the bridge receives the subject", title);
+  check(title === "Dune: Part Two on cinemaxxx", "the bridge receives the subject", title);
   check(text === movie.description, "the bridge receives the description as the text", (text ?? "").slice(0, 40));
   check(!text?.includes("http"), "the bridge text carries no raw URL");
   check(url === `${ORIGIN}/share/42`, "the bridge receives the landing URL", url);
@@ -249,7 +254,7 @@ section("Browser — Web Share API");
   check(outcome === "shared", "a supported browser reports success", outcome);
   check(calls.share.length === 1, "navigator.share is called once");
   const data = calls.share[0] ?? {};
-  check(data.title === "Dune: Part Two on CINEMAX", "the browser receives the subject");
+  check(data.title === "Dune: Part Two on cinemaxxx", "the browser receives the subject");
   check(data.url === `${ORIGIN}/share/42`, "the browser receives the landing URL");
   check(data.text === movie.description, "the browser receives the description as the text");
   check(data.files === undefined, "nothing is downloaded before sharing, so the sheet opens at once");
@@ -301,14 +306,14 @@ console.log("");
 section("Official domain");
 {
   const { api } = load();
-  check(api.SHARE_SITE_URL === "https://cinemaxtv.space", "the canonical origin is the official domain", api.SHARE_SITE_URL);
+  check(api.SHARE_SITE_URL === ORIGIN, "the canonical origin is the official domain", api.SHARE_SITE_URL);
   // Even when the page itself is served from a deployment hostname, the link a
   // share carries is the official one.
   const preview = load();
   preview.windowObject.location.origin = "https://cinemax-orpin.vercel.app";
   const previewPayload = preview.api.buildSharePayload(movie);
   check(
-    previewPayload.url === "https://cinemaxtv.space/share/42",
+    previewPayload.url === `${ORIGIN}/share/42`,
     "a share made from a deployment hostname still points at the official domain",
     previewPayload.url
   );
@@ -320,7 +325,7 @@ section("Official domain");
     ["payload", JSON.stringify(api.buildSharePayload(movie, api.SHARE_SITE_URL))],
   ]) {
     check(!/vercel\.app/i.test(value), `the ${label} names no deployment host`, value.slice(0, 48));
-    check(value.includes("cinemaxtv.space"), `the ${label} points at the official domain`);
+    check(value.includes(new URL(ORIGIN).host), `the ${label} points at the official domain`);
   }
 }
 

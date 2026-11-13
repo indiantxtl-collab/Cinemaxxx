@@ -1,5 +1,5 @@
 {
-  "name": "cinemax",
+  "name": "cinemaxxx",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,6 +8,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "verify:api": "node scripts/verify-admin.mjs",
+    "verify:channels": "node scripts/verify-channels.mjs",
+    "verify:schema": "node scripts/verify-schema.mjs",
     "verify:logos": "node scripts/verify-platform-logos.mjs",
     "verify:platforms": "node scripts/verify-platform-registry.mjs",
     "licenses": "node scripts/license-report.mjs",

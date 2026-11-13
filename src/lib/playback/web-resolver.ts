@@ -132,10 +132,10 @@ function providerFor(url: URL, id: string, tagline: string, restriction?: string
   };
 }
 
-const PAGE_PROVIDER_TAGLINE = "This page’s own player plays inside Cinemax with its own controls.";
+const PAGE_PROVIDER_TAGLINE = "This page’s own player plays inside cinemaxxx with its own controls.";
 const PAGE_PROVIDER_RESTRICTION =
   "Subtitles, quality and speed are the provider’s own controls. Some sites ask you to sign in inside the player.";
-const MEDIA_PROVIDER_TAGLINE = "Video found on this page plays in the Cinemax player.";
+const MEDIA_PROVIDER_TAGLINE = "Video found on this page plays in the cinemaxxx player.";
 
 function makeResolution(originalUrl: string, canonicalUrl: string, provider: ProviderInfo, kind: LinkResolution["kind"], playback: PlaybackPlan): WebPlaybackResult {
   return {
@@ -325,7 +325,7 @@ async function resolvePage(page: SafeResponse, rawUrl: string, embedderOrigin: s
     const knownEmbed = strict.ok && strict.playback.strategy === "embed" && strict.provider.id !== "web";
     frameCandidates.push({
       src: iframeUrl.toString(),
-      provider: knownEmbed ? strict.provider : providerFor(iframeUrl, "web-embed", "This provider's own embedded player plays inside Cinemax."),
+      provider: knownEmbed ? strict.provider : providerFor(iframeUrl, "web-embed", "This provider's own embedded player plays inside cinemaxxx."),
       knownEmbed,
       kind: knownEmbed && strict.ok ? strict.kind : "page",
       embedTitle: knownEmbed && strict.ok && strict.playback.strategy === "embed"
@@ -413,7 +413,7 @@ async function resolvePage(page: SafeResponse, rawUrl: string, embedderOrigin: s
 
   // 6. Honest hand-off.
   const reason = !hasPlayer
-    ? "Cinemax found no playable video or player on this page."
+    ? "cinemaxxx found no playable video or player on this page."
     : "This page’s player refuses to be shown inside another site, and no playable video file was published on it.";
   return {
     ok: true,
@@ -438,7 +438,7 @@ async function resolvePage(page: SafeResponse, rawUrl: string, embedderOrigin: s
 function browserPlayerFallback(rawUrl: string, url: URL): WebPlaybackResult | null {
   if (!mayFrame(url) || !looksLikePlayerPage(url)) return null;
   const src = url.toString();
-  return makeResolution(rawUrl, src, providerFor(url, "web-player", "Trying the provider's own player inside Cinemax."), "page", {
+  return makeResolution(rawUrl, src, providerFor(url, "web-player", "Trying the provider's own player inside cinemaxxx."), "page", {
     strategy: "embed",
     src,
     embedTitle: `${displayHost(src)} player`,
@@ -503,7 +503,7 @@ async function resolveUncached(rawUrl: string, embedderOrigin: string | undefine
     return resolvePage(response, rawUrl, embedderOrigin, deadline);
   }
 
-  return { ok: false, status: 415, message: "That link is not a video, a stream or a web page Cinemax can play." };
+  return { ok: false, status: 415, message: "That link is not a video, a stream or a web page cinemaxxx can play." };
 }
 
 /**

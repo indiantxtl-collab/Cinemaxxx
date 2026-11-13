@@ -8,7 +8,7 @@
 # The DOM layer needs jsdom. It is installed once, into the git-ignored toolchain
 # cache, by android/tests/install-test-deps.sh - which this script runs
 # automatically when jsdom is missing and npm is available. Set
-# CINEMAX_REQUIRE_JSDOM=1 to turn a missing jsdom (or node) into a failure
+# CINEMAXXX_REQUIRE_JSDOM=1 to turn a missing jsdom (or node) into a failure
 # instead of a skip; CI sets it so this layer can never silently disappear.
 #
 # Layers:
@@ -27,7 +27,7 @@ export PYTHONDONTWRITEBYTECODE=1
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT="$(dirname "$SCRIPT_DIR")"
 REPO="$(dirname "$PROJECT")"
-CACHE="${CINEMAX_TOOLCHAIN:-$PROJECT/.toolchain}"
+CACHE="${CINEMAXXX_TOOLCHAIN:-$PROJECT/.toolchain}"
 WORK="$PROJECT/build/tests"
 
 SKIP_BUILD=0
@@ -57,9 +57,9 @@ result() { if [ "$1" = "0" ]; then printf "    ${C_PASS}PASS${C_OFF} %s\n" "$2";
 JAVA="$CACHE/jdk/bin/java"
 ECJ_JAR="$CACHE/lib/ecj.jar"
 ANDROID_JAR="$CACHE/lib/android.jar"
-APK="$PROJECT/dist/Cinemax-1.1.0.apk"
+APK="${CINEMAXXX_TEST_APK:-$PROJECT/dist/cinemaxxx-1.1.0.apk}"
 JSDOM_DIR="$CACHE/tests/node_modules/jsdom"
-REQUIRE_JSDOM="${CINEMAX_REQUIRE_JSDOM:-0}"
+REQUIRE_JSDOM="${CINEMAXXX_REQUIRE_JSDOM:-0}"
 
 # The DOM layer is only as good as jsdom being present: install it once when it
 # is missing, so `run-tests.sh` covers all four layers on a fresh checkout.
@@ -73,6 +73,8 @@ fi
 if [ "$SKIP_BUILD" = "0" ] || [ ! -f "$APK" ] || [ ! -d "$PROJECT/build/gen" ]; then
   step "Building the APK"
   bash "$PROJECT/build.sh" | tail -n 6
+  build_status=${PIPESTATUS[0]}
+  if [ "$build_status" -ne 0 ]; then exit "$build_status"; fi
 fi
 
 mkdir -p "$WORK/classes" "$WORK/out"
@@ -126,7 +128,7 @@ if ! command -v node >/dev/null 2>&1; then
     note "node is not installed - layer skipped"
   fi
 elif [ ! -d "$JSDOM_DIR" ] && [ "$REQUIRE_JSDOM" = "1" ]; then
-  result 1 "jsdom is required (CINEMAX_REQUIRE_JSDOM=1) but is not installed - run android/tests/install-test-deps.sh"
+  result 1 "jsdom is required (CINEMAXXX_REQUIRE_JSDOM=1) but is not installed - run android/tests/install-test-deps.sh"
 elif [ ! -f "$INJECTION" ]; then
   result 1 "the injection script was not produced (unit checks failed)"
 else

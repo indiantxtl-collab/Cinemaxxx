@@ -3,6 +3,12 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { CatalogueMovie, FeaturedSlide } from "@/lib/catalogue";
 
+export function testAdminCredentials() {
+  const email = process.env.ADMIN_EMAIL, password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) throw new Error("Set ADMIN_EMAIL and ADMIN_PASSWORD for the isolated test deployment.");
+  return { email, password };
+}
+
 export async function readCatalogue(request: APIRequestContext) {
   const response = await request.get("/api/movies?limit=500");
   expect(response.ok(), "A connected test database is required").toBeTruthy();
@@ -19,6 +25,9 @@ export async function expectNoOverflow(page: Page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBeTruthy();
 }
 export async function preparePage(page: Page, intro = false) {
+  // Existing visual tests opt out of the separate first-entry declaration.
+  // age-declaration.spec.ts tests the real gate without this fixture.
+  await page.addInitScript(() => localStorage.setItem("cinemaxxx:age-declaration:v1", "accepted"));
   if (!intro) await page.addInitScript(() => sessionStorage.setItem("cinemax:prism-intro:v1", "1"));
   await page.addInitScript(() => localStorage.setItem("cinemax_seeded", "1"));
   // Offline artwork is a deliberate failure test. Movie records and all APIs stay real.
@@ -26,7 +35,7 @@ export async function preparePage(page: Page, intro = false) {
   await page.route("https://image.tmdb.org/**", (route) => route.abort());
 }
 export async function createPlaybackMovie(request: APIRequestContext, source: string, subtitleUrl = "") {
-  const login = await request.post("/api/admin/login", { data: { email: process.env.ADMIN_EMAIL || "admin@cinemax.com", password: process.env.ADMIN_PASSWORD || "Admin@123" } });
+  const login = await request.post("/api/admin/login", { data: testAdminCredentials() });
   expect(login.ok(), "Configure test-studio credentials").toBeTruthy();
   const response = await request.post("/api/movies", { data: { title: `Prism playback verification ${Date.now()}`, description: "Temporary automated test record. Removed after the test.", year: 2024, rating: "8.0", duration: "1m 30s", genre: "Sci-Fi", type: "Movie", category: "trending", posterUrl: "", backdropUrl: "", videoUrl: source, subtitleUrl, subtitleLanguage: "en" } });
   expect(response.status()).toBe(201);
@@ -84,7 +93,7 @@ export async function servePlaybackFixtures(page: Page) {
 }
 
 export async function createMovieWithTrailer(request: APIRequestContext, trailerUrl: string) {
-  const login = await request.post("/api/admin/login", { data: { email: process.env.ADMIN_EMAIL || "admin@cinemax.com", password: process.env.ADMIN_PASSWORD || "Admin@123" } });
+  const login = await request.post("/api/admin/login", { data: testAdminCredentials() });
   expect(login.ok(), "Configure test-studio credentials").toBeTruthy();
   const response = await request.post("/api/movies", { data: { title: `Prism playback verification trailer ${Date.now()}-${Math.floor(Math.random() * 1e6)}`, description: "Temporary automated trailer-preview record. Removed after the test.", year: 2024, rating: "8.0", duration: "1m 30s", genre: "Sci-Fi", type: "Movie", category: "trending", posterUrl: "", backdropUrl: "", videoUrl: "/__e2e__/prism-test.webm", trailerUrl } });
   expect(response.status()).toBe(201);
@@ -92,7 +101,7 @@ export async function createMovieWithTrailer(request: APIRequestContext, trailer
 }
 
 export async function deleteMovie(request: APIRequestContext, id: number) {
-  await request.post("/api/admin/login", { data: { email: process.env.ADMIN_EMAIL || "admin@cinemax.com", password: process.env.ADMIN_PASSWORD || "Admin@123" } });
+  await request.post("/api/admin/login", { data: testAdminCredentials() });
   const response = await request.delete(`/api/movies/${id}`);
   expect(response.ok()).toBeTruthy();
 }

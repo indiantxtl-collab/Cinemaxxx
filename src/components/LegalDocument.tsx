@@ -20,7 +20,7 @@ import {
 export function LegalCrumbs({ current }: { current: string }) {
   return (
     <nav className="legal-crumbs" aria-label="Breadcrumb">
-      <Link href="/">CINEMAX</Link>
+      <Link href="/">cinemaxxx</Link>
       <span aria-hidden="true">/</span>
       <Link href="/license">Legal</Link>
       <span aria-hidden="true">/</span>
@@ -190,7 +190,7 @@ export function LegalFooterNav({ current }: { current: LegalPageMeta }) {
             {page.title}
           </Link>
         ))}
-        <Link href="/">Back to CINEMAX</Link>
+        <Link href="/">Back to cinemaxxx</Link>
       </div>
       <p className="legal-foot-note">
         {LEGAL_OWNER.summary} Last reviewed {current.reviewed}. If anything on this page

@@ -1,6 +1,6 @@
 name: Android CI
 
-# Builds the signed, installable Cinemax APK on every push and pull request.
+# Builds the signed, installable cinemaxxx APK on every push and pull request.
 #
 # The Android app in this repository is deliberately Gradle-free (see
 # android/README.md): there is no gradlew, no settings.gradle and no Android SDK
@@ -8,8 +8,8 @@ name: Android CI
 # android/tools/fetch-toolchain.sh, so the build runs the same command here as it
 # does on a developer machine:
 #
-#   bash android/build.sh              -> android/dist/Cinemax-1.1.0.apk
-#   bash android/build.sh --debug      -> android/dist/Cinemax-1.1.0-debug.apk
+#   bash android/build.sh              -> android/dist/cinemaxxx-1.1.0.apk
+#   bash android/build.sh --debug      -> android/dist/cinemaxxx-1.1.0-debug.apk
 #   bash android/tests/run-tests.sh    -> JVM + JS + DOM + artwork + APK checks
 #
 # The finished APK is uploaded as a downloadable artifact.
@@ -30,7 +30,9 @@ concurrency:
 env:
   # The DOM layer must really run in CI: jsdom is installed below, and a missing
   # jsdom is treated as a failure instead of a silent skip.
-  CINEMAX_REQUIRE_JSDOM: "1"
+  CINEMAXXX_REQUIRE_JSDOM: "1"
+  CINEMAXXX_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL }}
+  NEXT_PUBLIC_SITE_URL: ${{ vars.CINEMAXXX_SITE_URL }}
 
 jobs:
   apk:
@@ -50,9 +52,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: android/.toolchain
-          key: cinemax-toolchain-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/tools/fetch-toolchain.sh') }}
+          key: cinemaxxx-toolchain-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('android/tools/fetch-toolchain.sh') }}
           restore-keys: |
-            cinemax-toolchain-${{ runner.os }}-${{ runner.arch }}-
+            cinemaxxx-toolchain-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Fetch the pinned Android toolchain (aapt2, d8, ecj, apksigner, JRE)
         run: bash android/tools/fetch-toolchain.sh
@@ -63,15 +65,37 @@ jobs:
       # The debug variant is built first on purpose: android/build.sh wipes
       # android/build/ each run, so the release build below must be the last one
       # to touch it (the test log and the splash preview are written afterwards).
+      - name: Require the independent deployment origin and private release identity
+        env:
+          KEYSTORE_BASE64: ${{ secrets.CINEMAXXX_KEYSTORE_BASE64 }}
+          KEY_ALIAS: ${{ secrets.CINEMAXXX_KEY_ALIAS }}
+          STORE_PASS: ${{ secrets.CINEMAXXX_STORE_PASS }}
+          KEY_PASS: ${{ secrets.CINEMAXXX_KEY_PASS }}
+        run: |
+          test -n "$CINEMAXXX_SITE_URL" || { echo '::error::Set the CINEMAXXX_SITE_URL repository variable to this fork HTTPS origin'; exit 1; }
+          for name in KEYSTORE_BASE64 KEY_ALIAS STORE_PASS KEY_PASS; do
+            test -n "${!name:-}" || { echo "::error::Set the CINEMAXXX_$name repository secret"; exit 1; }
+          done
+          umask 077
+          python3 - <<'PYEOF'
+          import base64, os
+          from pathlib import Path
+          key = Path(os.environ["RUNNER_TEMP"]) / "cinemaxxx-release.p12"
+          key.write_bytes(base64.b64decode(os.environ["KEYSTORE_BASE64"], validate=True))
+          key.chmod(0o600)
+          with open(os.environ["GITHUB_ENV"], "a") as output:
+              output.write(f"CINEMAXXX_KEYSTORE={key}\n")
+          PYEOF
+
       - name: Build and sign the debuggable variant
         run: bash android/build.sh --debug
 
       - name: Verify the debuggable variant
         run: |
-          apk=android/dist/Cinemax-1.1.0-debug.apk
+          apk=android/dist/cinemaxxx-1.1.0-debug.apk
           [ -f "$apk" ] || { echo "::error::no debug APK was produced"; exit 1; }
           android/.toolchain/bin/aapt2 dump badging "$apk" >/tmp/debug-badging.txt 2>/dev/null || true
-          grep -q "^package: name='com.cinemax.app'" /tmp/debug-badging.txt \
+          grep -q "^package: name='com.cinemaxxx.app'" /tmp/debug-badging.txt \
             || { echo "::error::the debug APK lost the application id"; cat /tmp/debug-badging.txt; exit 1; }
           grep -q "versionCode='2' versionName='1.1.0'" /tmp/debug-badging.txt \
             || { echo "::error::the debug APK lost the version"; cat /tmp/debug-badging.txt; exit 1; }
@@ -81,7 +105,15 @@ jobs:
           echo "debug APK: $(wc -c <"$apk") bytes, debuggable, same id/version as release"
 
       - name: Build, sign and verify the release APK
+        env:
+          CINEMAXXX_KEY_ALIAS: ${{ secrets.CINEMAXXX_KEY_ALIAS }}
+          CINEMAXXX_STORE_PASS: ${{ secrets.CINEMAXXX_STORE_PASS }}
+          CINEMAXXX_KEY_PASS: ${{ secrets.CINEMAXXX_KEY_PASS }}
         run: bash android/build.sh
+
+      - name: Remove the temporary release key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/cinemaxxx-release.p12"
 
       - name: Run the Android test suite
         run: |
@@ -121,7 +153,7 @@ jobs:
           {
             echo "### Android checks"
             grep -E "checks: " "$log" | sed 's/^/ - /'
-            echo " - APK: $(wc -c <android/dist/Cinemax-1.1.0.apk) bytes"
+            echo " - APK: $(wc -c <android/dist/cinemaxxx-1.1.0.apk) bytes"
           } >>"$GITHUB_STEP_SUMMARY"
           grep -E "checks: " "$log"
 
@@ -131,19 +163,19 @@ jobs:
       - name: Report the artefact
         run: |
           cd android/dist
-          sha256sum Cinemax-1.1.0.apk | tee Cinemax-1.1.0.apk.sha256
-          ls -l Cinemax-1.1.0.apk
+          sha256sum cinemaxxx-1.1.0.apk | tee cinemaxxx-1.1.0.apk.sha256
+          ls -l cinemaxxx-1.1.0.apk
 
       - name: Upload the installable APK
         uses: actions/upload-artifact@v7
         with:
-          name: cinemax-android-apk
+          name: cinemaxxx-android-apk
           path: |
-            android/dist/Cinemax-1.1.0.apk
-            android/dist/Cinemax-latest.apk
-            android/dist/Cinemax-1.1.0.apk.sha256
-            android/dist/Cinemax-1.1.0-debug.apk
-            android/dist/Cinemax-latest-debug.apk
+            android/dist/cinemaxxx-1.1.0.apk
+            android/dist/cinemaxxx-latest.apk
+            android/dist/cinemaxxx-1.1.0.apk.sha256
+            android/dist/cinemaxxx-1.1.0-debug.apk
+            android/dist/cinemaxxx-latest-debug.apk
             android/build/test-suite.log
             android/build/splash-preview.log
             android/build/preview/*.png
@@ -190,6 +222,9 @@ jobs:
       # fallback fails here instead of on a phone.
       - name: Verify the sharing rules
         run: npm run verify:share
+        env:
+          # The check builds share URLs only; it makes no request to this origin.
+          NEXT_PUBLIC_SITE_URL: https://verification.example.invalid
 
       # The APK the download button hands out is the one this workflow builds;
       # this checks the artifact that is committed for the website, so a broken

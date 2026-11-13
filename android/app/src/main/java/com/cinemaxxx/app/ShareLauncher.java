@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;

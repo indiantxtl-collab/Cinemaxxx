@@ -6,6 +6,7 @@ import Logo from "@/components/Logo";
 import Artwork from "@/components/Artwork";
 import PlatformPicker from "@/components/PlatformPicker";
 import PlatformLogo from "@/components/PlatformLogo";
+import ChannelManager from "@/components/studio/ChannelManager";
 import {
   catalogueTokens,
   platformsForMovie,
@@ -16,18 +17,18 @@ import {
 
 interface Movie { id: number; title: string; description: string | null; year: number | null; rating: string | null; duration: string | null; genre: string | null; language: string | null; type: string | null; director: string | null; cast: string | null; posterUrl: string | null; backdropUrl: string | null; videoUrl: string | null; subtitleUrl: string | null; subtitleLanguage: string | null; rightsConfirmed: boolean | null; catalogStatus?: string | null; sourceType?: string | null; licenseInfo?: string | null; sourceAttribution?: string | null; releaseDate?: string | null; trailerUrl?: string | null; lastVerifiedAt?: string | null; category: string | null; featured: boolean | null; }
 interface Slide { id: number; title: string; subtitle: string | null; imageUrl: string | null; movieId: number | null; sortOrder: number | null; active: boolean | null; }
-interface Category { id: number; name: string; slug: string; sortOrder: number | null; }
+interface Category { id: number; name: string; slug: string; sortOrder: number; enabled: boolean; }
 interface WatchlistEntry { id: number; movieId: number; sessionId: string; createdAt: string | null; movie: Movie | null; }
-interface Stats { movies: number; slides: number; categories: number; watchlistItems: number; schemaOk?: boolean | null; schemaError?: string | null; }
+interface Stats { movies: number; slides: number; categories: number; channels: number; watchlistItems: number; schemaOk?: boolean | null; schemaError?: string | null; }
 interface Flash { text: string; kind: "ok" | "error"; }
 
-type Tab = "overview" | "movies" | "slides" | "categories" | "lists";
+type Tab = "overview" | "movies" | "slides" | "categories" | "channels" | "lists";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [authed, setAuthed] = useState(false);
   const [tab, setTab] = useState<Tab>("overview");
-  const [stats, setStats] = useState<Stats>({ movies: 0, slides: 0, categories: 0, watchlistItems: 0 });
+  const [stats, setStats] = useState<Stats>({ movies: 0, slides: 0, categories: 0, channels: 0, watchlistItems: 0 });
   const [movies, setMovies] = useState<Movie[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -46,7 +47,7 @@ export default function AdminDashboard() {
 
   const [sTitle, setSTitle] = useState(""); const [sSubtitle, setSSubtitle] = useState(""); const [sImage, setSImage] = useState(""); const [sMovieId, setSMovieId] = useState<number | null>(null); const [sOrder, setSOrder] = useState(0); const [sActive, setSActive] = useState(true);
 
-  const [cName, setCName] = useState(""); const [cSlug, setCSlug] = useState("");
+  const [cName, setCName] = useState(""); const [cSlug, setCSlug] = useState(""); const [cOrder, setCOrder] = useState(0); const [cEnabled, setCEnabled] = useState(true);
 
 
   const loadData = useCallback(async () => {
@@ -106,7 +107,7 @@ export default function AdminDashboard() {
   };
 
   /** One place that turns a failed request into a message the admin can act on. */
-  const mutate = async (url: string, method: string, body?: unknown): Promise<{ ok: boolean; error?: string }> => {
+  const mutate = async (url: string, method: string, body?: unknown): Promise<{ ok: boolean; error?: string; data?: unknown }> => {
     try {
       const res = await fetch(url, {
         method,
@@ -123,7 +124,7 @@ export default function AdminDashboard() {
         try { window.sessionStorage.removeItem("cinemax:catalogue:v1"); } catch { /* Private browsing. */ }
         window.dispatchEvent(new Event("cinemax:catalogue-refresh"));
       }
-      return { ok: true };
+      return { ok: true, data };
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Network error" };
     }
@@ -131,11 +132,11 @@ export default function AdminDashboard() {
 
   const resetMovie = () => { setMTitle(""); setMDesc(""); setMYear(2024); setMRating("8.0"); setMDuration("2h 0m"); setMGenre(""); setMLang("English"); setMType("Movie"); setMDirector(""); setMCast(""); setMPoster(""); setMBackdrop(""); setMVideo(""); setMSubtitle(""); setMSubtitleLanguage("en"); setMRightsConfirmed(false); setMCatalogStatus("verified_playable"); setMSourceType("public_domain"); setMLicenseInfo(""); setMSourceAttribution(""); setMReleaseDate(""); setMTrailerUrl(""); setMCategory("trending"); setMFeatured(false); setMPlatforms([]); setEditingMovie(null); };
   const resetSlide = () => { setSTitle(""); setSSubtitle(""); setSImage(""); setSMovieId(null); setSOrder(0); setSActive(true); setEditingSlide(null); };
-  const resetCat = () => { setCName(""); setCSlug(""); setEditingCat(null); };
+  const resetCat = () => { setCName(""); setCSlug(""); setCOrder(0); setCEnabled(true); setEditingCat(null); };
 
   const editMovie = (m: Movie) => { setEditingMovie(m); setMTitle(m.title); setMDesc(m.description||""); setMYear(m.year||2024); setMRating(m.rating||"8.0"); setMDuration(m.duration||""); setMGenre(m.genre||""); setMLang(m.language||""); setMType(m.type||"Movie"); setMDirector(m.director||""); setMCast(m.cast||""); setMPoster(m.posterUrl||""); setMBackdrop(m.backdropUrl||""); setMVideo(m.videoUrl||""); setMSubtitle(m.subtitleUrl||""); setMSubtitleLanguage(m.subtitleLanguage||"en"); setMRightsConfirmed(m.rightsConfirmed||false); setMCatalogStatus(m.catalogStatus||"verified_playable"); setMSourceType(m.sourceType||"public_domain"); setMLicenseInfo(m.licenseInfo||""); setMSourceAttribution(m.sourceAttribution||""); setMReleaseDate(m.releaseDate||""); setMTrailerUrl(m.trailerUrl||""); setMCategory(catalogueTokens(m.category)[0] || "trending"); setMPlatforms(platformsFromTags(m.category)); setMFeatured(m.featured||false); setShowMovieForm(true); };
   const editSlide = (s: Slide) => { setEditingSlide(s); setSTitle(s.title); setSSubtitle(s.subtitle||""); setSImage(s.imageUrl||""); setSMovieId(s.movieId); setSOrder(s.sortOrder||0); setSActive(s.active!==false); setShowSlideForm(true); };
-  const editCat = (c: Category) => { setEditingCat(c); setCName(c.name); setCSlug(c.slug); setShowCatForm(true); };
+  const editCat = (c: Category) => { setEditingCat(c); setCName(c.name); setCSlug(c.slug); setCOrder(c.sortOrder); setCEnabled(c.enabled); setShowCatForm(true); };
 
   const saveMovie = async () => {
     if (!mTitle.trim()) { flash("Title is required", "error"); return; }
@@ -179,18 +180,36 @@ export default function AdminDashboard() {
     if (!cName.trim()) { flash("Name is required", "error"); return; }
     const url = editingCat ? `/api/categories/${editingCat.id}` : "/api/categories";
     setBusy(true);
-    const result = await mutate(url, editingCat ? "PUT" : "POST", { name: cName, slug: cSlug });
+    const result = await mutate(url, editingCat ? "PUT" : "POST", { name: cName, slug: cSlug, sortOrder: cOrder, enabled: cEnabled });
     setBusy(false);
     if (!result.ok) { flash(result.error || "Could not save", "error"); return; }
     flash(editingCat ? "Updated" : "Added"); resetCat(); setShowCatForm(false); loadData();
   };
   const delCat = async (id:number) => {
-    if(!confirm("Delete?")) return;
+    if(!confirm("Delete this category? Move or delete its channels first. Existing movie tags are kept.")) return;
     setBusy(true);
     const result = await mutate(`/api/categories/${id}`, "DELETE");
     setBusy(false);
     if (!result.ok) { flash(result.error || "Could not delete", "error"); return; }
     flash("Deleted"); loadData();
+  };
+  const moveCategory = async (index: number, direction: number) => {
+    const ids = categories.map((c) => c.id);
+    const target = index + direction;
+    if (target < 0 || target >= ids.length) return;
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    setBusy(true);
+    const result = await mutate("/api/admin/categories/reorder", "PUT", { ids });
+    setBusy(false);
+    if (!result.ok) { flash(result.error || "Could not reorder", "error"); return; }
+    await loadData();
+  };
+  const toggleCategory = async (category: Category) => {
+    setBusy(true);
+    const result = await mutate(`/api/categories/${category.id}`, "PUT", { enabled: !category.enabled });
+    setBusy(false);
+    if (!result.ok) { flash(result.error || "Could not update", "error"); return; }
+    await loadData();
   };
   const delEntry = async (id:number) => {
     if(!confirm("Remove this saved title?")) return;
@@ -211,8 +230,8 @@ export default function AdminDashboard() {
 
       <header style={{ padding: "20px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <Link href="/" aria-label="Cinemax home"><Logo /></Link>
-          <h1 style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 5, fontWeight: 600 }}>Cinemax studio</h1>
+          <Link href="/" aria-label="cinemaxxx home"><Logo /></Link>
+          <h1 style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 5, fontWeight: 600 }}>cinemaxxx studio</h1>
         </div>
         <button onClick={() => fetch("/api/admin/logout",{method:"POST"}).then(() => router.push("/gate-keeper"))} style={{ padding: "10px 20px", borderRadius: 12, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 11, fontWeight: 700 }}>Logout</button>
       </header>
@@ -231,7 +250,7 @@ export default function AdminDashboard() {
 
       {/* Tabs */}
       <nav style={{ display: "flex", gap: 8, padding: "16px 20px", overflowX: "auto" }} className="hide-scrollbar">
-        {(["overview","movies","slides","categories","lists"] as Tab[]).map((t) => (
+        {(["overview","movies","slides","categories","channels","lists"] as Tab[]).map((t) => (
           <button key={t} onClick={() => setTab(t)} style={{ padding: "10px 20px", borderRadius: 12, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", border: "none", cursor: "pointer", flexShrink: 0, background: tab===t ? "var(--gloss-fill-strong)" : "var(--surface)", boxShadow: tab===t ? "var(--gloss-shadow)" : "none", color: tab===t ? "#fff" : "var(--text-soft)" }}>{t}</button>
         ))}
       </nav>
@@ -240,7 +259,7 @@ export default function AdminDashboard() {
         {/* === OVERVIEW === */}
         {tab === "overview" && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 8 }}>
-            {[{l:"Movies",v:stats.movies},{l:"Slides",v:stats.slides},{l:"Categories",v:stats.categories},{l:"Watchlist",v:stats.watchlistItems}].map(s=>(
+            {[{l:"Movies",v:stats.movies},{l:"Slides",v:stats.slides},{l:"Categories",v:stats.categories},{l:"Channels",v:stats.channels},{l:"Watchlist",v:stats.watchlistItems}].map(s=>(
               <div key={s.l} className="detail-panel" style={{ textAlign: "center" }}>
                 <p style={{ fontSize: 32, fontWeight: 900, marginBottom: 4 }}>{s.v}</p>
                 <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>{s.l}</p>
@@ -280,7 +299,7 @@ export default function AdminDashboard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div><label style={labelStyle}>Title</label><input className="glass-input" value={mTitle} onChange={e=>setMTitle(e.target.value)} /></div>
-                    <div><label style={labelStyle}>Category</label><select className="glass-input" value={mCategory} onChange={e=>setMCategory(e.target.value)}><option value="trending">Trending</option>{categories.map(c=><option key={c.id} value={c.slug}>{c.name}</option>)}</select></div>
+                    <div><label style={labelStyle}>Category</label><select className="glass-input" value={mCategory} onChange={e=>setMCategory(e.target.value)}><option value="trending" hidden={categories.some(c=>c.slug==="trending")}>Trending</option>{categories.map(c=><option key={c.id} value={c.slug}>{c.name}</option>)}</select></div>
                   </div>
                   <PlatformPicker value={mPlatforms} onChange={setMPlatforms} disabled={busy} />
                   <div><label style={labelStyle}>Synopsis</label><textarea className="glass-input" rows={3} value={mDesc} onChange={e=>setMDesc(e.target.value)} style={{ resize: "vertical", minHeight: 80 }} /></div>
@@ -340,7 +359,7 @@ export default function AdminDashboard() {
                   </div>
                   <label style={{ display: "flex", alignItems: "flex-start", gap: 9, cursor: "pointer", padding: "12px 13px", border: "1px solid rgba(165,243,208,0.16)", borderRadius: 12, background: "rgba(165,243,208,0.035)" }}>
                     <input type="checkbox" checked={mRightsConfirmed} onChange={e=>setMRightsConfirmed(e.target.checked)} style={{ width: 17, height: 17, marginTop: 1, accentColor: "var(--accent)" }} />
-                    <span style={{ fontSize: 11, fontWeight: 650, lineHeight: 1.55, color: "rgba(238,248,243,0.7)" }}>I confirm Cinemax is authorized to publicly stream and distribute this title. Required before a magnet source can be played.</span>
+                    <span style={{ fontSize: 11, fontWeight: 650, lineHeight: 1.55, color: "rgba(238,248,243,0.7)" }}>I confirm cinemaxxx is authorized to publicly stream and distribute this title. Required before a magnet source can be played.</span>
                   </label>
                   <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}><input type="checkbox" checked={mFeatured} onChange={e=>setMFeatured(e.target.checked)} style={{ width: 18, height: 18 }} /><span style={{ fontSize: 12, fontWeight: 700 }}>Featured</span></label>
                   <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
@@ -438,8 +457,12 @@ export default function AdminDashboard() {
               <div className="detail-panel" style={{ marginBottom: 20 }}>
                 <h3 style={{ fontSize: 14, fontWeight: 800, marginBottom: 20 }}>{editingCat ? "Edit Category" : "New Category"}</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                  <div><label style={labelStyle}>Name</label><input className="glass-input" value={cName} onChange={e=>setCName(e.target.value)} /></div>
-                  <div><label style={labelStyle}>Slug (optional)</label><input className="glass-input" value={cSlug} onChange={e=>setCSlug(e.target.value)} placeholder="auto-generated" /></div>
+                  <div><label htmlFor="category-name" style={labelStyle}>Name</label><input id="category-name" className="glass-input" value={cName} onChange={e=>setCName(e.target.value)} /></div>
+                  <div><label htmlFor="category-slug" style={labelStyle}>Slug (optional)</label><input id="category-slug" className="glass-input" value={cSlug} onChange={e=>setCSlug(e.target.value)} placeholder="auto-generated" /></div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div><label style={labelStyle}>Sort Order</label><input aria-label="Category sort order" type="number" min={0} className="glass-input" value={cOrder} onChange={e=>setCOrder(Number(e.target.value))} /></div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}><input type="checkbox" checked={cEnabled} onChange={e=>setCEnabled(e.target.checked)} style={{ width: 18, height: 18 }} /><span style={{ fontSize: 12, fontWeight: 700 }}>Enabled</span></label>
+                  </div>
                   <div style={{ display: "flex", gap: 12 }}>
                     <button onClick={saveCat} disabled={busy} style={{ flex: 1, padding: "14px 0", borderRadius: 14, background: "var(--gloss-fill-strong)", boxShadow: "var(--gloss-shadow)", color: "#fff", fontWeight: 900, fontSize: 12, border: "none", cursor: "pointer", opacity: busy ? 0.6 : 1 }}>Save</button>
                     <button onClick={() => { setShowCatForm(false); resetCat(); }} style={{ padding: "14px 24px", borderRadius: 14, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>Cancel</button>
@@ -450,20 +473,26 @@ export default function AdminDashboard() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {categories.map((c) => (
-                <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 14, background: "rgba(20,20,20,0.6)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div>
+                <div key={c.id} className="studio-record-row" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: 14, borderRadius: 14, background: "rgba(20,20,20,0.6)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ minWidth: 0 }}>
                     <p style={{ fontSize: 14, fontWeight: 700 }}>{c.name}</p>
-                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 2, fontWeight: 600 }}>/{c.slug} • {movies.filter((m) => (m.category || "").toLowerCase() === c.slug.toLowerCase()).length} titles</p>
+                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 2, fontWeight: 600 }}>/{c.slug} • Order: {c.sortOrder} • {c.enabled ? "Enabled" : "Disabled"} • {movies.filter((m) => (m.category || "").split(",").some(tag => tag.trim().toLowerCase() === c.slug)).length} titles</p>
                   </div>
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={() => editCat(c)} style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(255,255,255,0.05)", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>✏️</button>
-                    <button onClick={() => delCat(c.id)} style={{ width: 34, height: 34, borderRadius: 8, background: "rgba(239,68,68,0.08)", border: "none", cursor: "pointer", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>🗑️</button>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <button aria-label={`Move ${c.name} up`} disabled={busy || categories.indexOf(c) === 0} onClick={() => moveCategory(categories.indexOf(c), -1)} className="studio-small-button">↑</button>
+                    <button aria-label={`Move ${c.name} down`} disabled={busy || categories.indexOf(c) === categories.length - 1} onClick={() => moveCategory(categories.indexOf(c), 1)} className="studio-small-button">↓</button>
+                    <button aria-label={`${c.enabled ? "Disable" : "Enable"} ${c.name}`} disabled={busy} onClick={() => toggleCategory(c)} className="studio-small-button" style={{ width: "auto", padding: "0 10px", fontSize: 11 }}>{c.enabled ? "Disable" : "Enable"}</button>
+                    <button aria-label={`Edit ${c.name}`} onClick={() => editCat(c)} className="studio-small-button">✏️</button>
+                    <button aria-label={`Delete ${c.name}`} disabled={busy} onClick={() => delCat(c.id)} className="studio-small-button" style={{ background: "rgba(239,68,68,0.08)" }}>🗑️</button>
                   </div>
                 </div>
               ))}
+              {!categories.length && <p className="studio-empty">No categories yet. Add one to organize channels.</p>}
             </div>
           </div>
         )}
+
+        {tab === "channels" && <ChannelManager categories={categories} mutate={mutate} onChanged={loadData} flash={flash} />}
 
         {/* === SAVED LISTS === */}
         {tab === "lists" && (

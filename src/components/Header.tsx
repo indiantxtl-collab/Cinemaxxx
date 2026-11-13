@@ -38,7 +38,7 @@ export default function Header() {
     <div className="header-sentinel" ref={sentinel} aria-hidden="true" />
     <header className="site-header-wrap" data-scrolled={scrolled} data-home={pathname === "/" || pathname.startsWith("/movie/")}>
       <div className="site-header">
-        <Link href="/" className="brand-lockup" aria-label="Cinemax home"><Logo /></Link>
+        <Link href="/" className="brand-lockup" aria-label="cinemaxxx home"><Logo /></Link>
         <nav className="desktop-nav" aria-label="Main navigation" style={{ "--nav-index": Math.max(0, active) } as CSSProperties}>
           <span className="desktop-nav-indicator" data-visible={active >= 0} aria-hidden="true" />
           {links.map((link, index) => <Link key={link.href} href={link.href} className="desktop-nav-link" aria-current={active === index ? "page" : undefined}>{link.label}</Link>)}
@@ -46,7 +46,7 @@ export default function Header() {
         <div className="header-actions">
           <Link href="/search" className="header-search" aria-label="Search movies and shows" aria-current={pathname === "/search" ? "page" : undefined}><Icon name="search" /><span>Search titles</span><kbd>/</kbd></Link>
           <Link href="/watchlist" className="header-icon-link" aria-label={`Open watchlist${savedIds.size ? `, ${savedIds.size} saved titles` : ""}`} aria-current={pathname === "/watchlist" ? "page" : undefined}><Icon name="bookmark" />{savedIds.size > 0 && <span className="header-count" aria-hidden="true">{savedIds.size > 99 ? "99+" : savedIds.size}</span>}</Link>
-          <Link href="/gate-keeper" className="header-studio" aria-label="Open Cinemax studio" title="Cinemax studio">C</Link>
+          <Link href="/gate-keeper" className="header-studio" aria-label="Open cinemaxxx studio" title="cinemaxxx studio">C</Link>
         </div>
       </div>
     </header>

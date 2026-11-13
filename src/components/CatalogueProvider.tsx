@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { CatalogueMovie, Category, FeaturedSlide } from "@/lib/catalogue";
+import type { CatalogueMovie, Category, Channel, FeaturedSlide } from "@/lib/catalogue";
 
 export const CATALOGUE_REFRESH_EVENT = "cinemax:catalogue-refresh";
 /** Legacy key written by earlier builds. It is only ever removed, never read. */
@@ -13,11 +13,12 @@ interface Catalogue {
   movies: CatalogueMovie[];
   categories: Category[];
   slides: FeaturedSlide[];
+  channels: Channel[];
   loading: boolean;
   error: string;
 }
 
-const initial: Catalogue = { movies: [], categories: [], slides: [], loading: true, error: "" };
+const initial: Catalogue = { movies: [], categories: [], slides: [], channels: [], loading: true, error: "" };
 const Context = createContext<Catalogue & { refresh: () => void } | null>(null);
 
 /**
@@ -70,10 +71,11 @@ export default function CatalogueProvider({ children }: { children: ReactNode })
       controller?.abort();
       controller = new AbortController();
       const signal = controller.signal;
-      const [movies, categories, slides] = await Promise.allSettled([
+      const [movies, categories, slides, channels] = await Promise.allSettled([
         readList<CatalogueMovie>("/api/movies?limit=500", signal),
         readList<Category>("/api/categories", signal),
         readList<FeaturedSlide>("/api/slides", signal),
+        readList<Channel>("/api/channels", signal),
       ]);
       if (signal.aborted) return;
       lastLoadedAt.current = Date.now();
@@ -82,13 +84,14 @@ export default function CatalogueProvider({ children }: { children: ReactNode })
         const nextMovies = reconcile(previous.movies, movies.status === "fulfilled" ? movies.value : []);
         const nextCategories = reconcile(previous.categories, categories.status === "fulfilled" ? categories.value : []);
         const nextSlides = reconcile(previous.slides, slides.status === "fulfilled" ? slides.value : []);
+        const nextChannels = reconcile(previous.channels, channels.status === "fulfilled" ? channels.value : []);
         // Nothing changed: keep the previous state object so the context value
         // keeps its identity and no consumer re-renders for it.
         if (nextMovies === previous.movies && nextCategories === previous.categories
-          && nextSlides === previous.slides && !previous.loading && previous.error === error) {
+          && nextSlides === previous.slides && nextChannels === previous.channels && !previous.loading && previous.error === error) {
           return previous;
         }
-        return { movies: nextMovies, categories: nextCategories, slides: nextSlides, loading: false, error };
+        return { movies: nextMovies, categories: nextCategories, slides: nextSlides, channels: nextChannels, loading: false, error };
       });
     };
     const refreshFromEvent = () => { void load(); };

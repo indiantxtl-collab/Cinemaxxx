@@ -91,7 +91,7 @@ export const netflixAdapter: ProviderAdapter = makeAdapter(
     }
     return null;
   },
-  "Netflix protects every stream with DRM and requires a Netflix membership. Cinemax can’t embed Netflix playback — open the title on Netflix to watch it there.",
+  "Netflix protects every stream with DRM and requires a Netflix membership. cinemaxxx can’t embed Netflix playback — open the title on Netflix to watch it there.",
 );
 
 /* --------------------------------------------------------------- Prime Video */
@@ -129,7 +129,7 @@ export const primeAdapter: ProviderAdapter = makeAdapter(
     }
     return null;
   },
-  "Prime Video protects every stream with DRM and requires an Amazon account. Cinemax can’t embed Prime Video playback — open the title on Prime Video to watch it there.",
+  "Prime Video protects every stream with DRM and requires an Amazon account. cinemaxxx can’t embed Prime Video playback — open the title on Prime Video to watch it there.",
 );
 
 /* --------------------------------------------------------- Disney+ Hotstar */
@@ -155,7 +155,7 @@ export const hotstarAdapter: ProviderAdapter = makeAdapter(
     }
     return null;
   },
-  "Disney+ Hotstar protects every stream with DRM and requires a Hotstar membership. Cinemax can’t embed Hotstar playback — open the title on Hotstar to watch it there.",
+  "Disney+ Hotstar protects every stream with DRM and requires a Hotstar membership. cinemaxxx can’t embed Hotstar playback — open the title on Hotstar to watch it there.",
 );
 
 /* ----------------------------------------------------------------- Disney+ */
@@ -179,7 +179,7 @@ export const disneyPlusAdapter: ProviderAdapter = makeAdapter(
     const id = last && /^[A-Za-z0-9-]{6,}$/.test(last) ? last : null;
     return id ? { kind: "episode-page", contentId: id, canonicalUrl: url.toString() } : null;
   },
-  "Disney+ protects every stream with DRM and requires a Disney+ membership. Cinemax can’t embed Disney+ playback — open the title on Disney+ to watch it there.",
+  "Disney+ protects every stream with DRM and requires a Disney+ membership. cinemaxxx can’t embed Disney+ playback — open the title on Disney+ to watch it there.",
 );
 
 /* ----------------------------------------------------------------- Apple TV+ */
@@ -203,7 +203,7 @@ export const appleTvAdapter: ProviderAdapter = makeAdapter(
     const id = last && last.startsWith("umc.") ? last : null;
     return id ? { kind: "episode-page", contentId: id, canonicalUrl: url.toString() } : null;
   },
-  "Apple TV+ protects every stream with DRM and requires an Apple subscription. Cinemax can’t embed Apple TV+ playback — open the title in the Apple TV app to watch it there.",
+  "Apple TV+ protects every stream with DRM and requires an Apple subscription. cinemaxxx can’t embed Apple TV+ playback — open the title in the Apple TV app to watch it there.",
 );
 
 /* ---------------------------------------------------------------- Regional OTTs */
@@ -230,7 +230,7 @@ export const zee5Adapter = regionalAdapter(
     restriction: "ZEE5 protects its catalogue with DRM and a ZEE5 membership. Third-party embedding is not permitted.",
   },
   ["zee5.com", "www.zee5.com"],
-  "ZEE5 protects its streams with DRM and requires a ZEE5 membership. Cinemax can’t embed ZEE5 playback — open the title on ZEE5 to watch it there.",
+  "ZEE5 protects its streams with DRM and requires a ZEE5 membership. cinemaxxx can’t embed ZEE5 playback — open the title on ZEE5 to watch it there.",
   (url) => url.pathname.split("/").filter(Boolean).pop() ?? null,
 );
 
@@ -244,7 +244,7 @@ export const sonyLivAdapter = regionalAdapter(
     restriction: "SonyLIV protects its catalogue with DRM and a SonyLIV membership. Third-party embedding is not permitted.",
   },
   ["sonyliv.com", "www.sonyliv.com"],
-  "SonyLIV protects its streams with DRM and requires a SonyLIV membership. Cinemax can’t embed SonyLIV playback — open the title on SonyLIV to watch it there.",
+  "SonyLIV protects its streams with DRM and requires a SonyLIV membership. cinemaxxx can’t embed SonyLIV playback — open the title on SonyLIV to watch it there.",
   (url) => url.pathname.split("/").filter(Boolean).pop() ?? null,
 );
 
@@ -258,7 +258,7 @@ export const jioCinemaAdapter = regionalAdapter(
     restriction: "JioCinema protects its catalogue with DRM and a JioCinema membership. Third-party embedding is not permitted.",
   },
   ["jiocinema.com", "www.jiocinema.com"],
-  "JioCinema protects its streams with DRM and requires a JioCinema membership. Cinemax can’t embed JioCinema playback — open the title on JioCinema to watch it there.",
+  "JioCinema protects its streams with DRM and requires a JioCinema membership. cinemaxxx can’t embed JioCinema playback — open the title on JioCinema to watch it there.",
   (url) => url.pathname.split("/").filter(Boolean).pop() ?? null,
 );
 
@@ -272,6 +272,6 @@ export const mxPlayerAdapter = regionalAdapter(
     restriction: "MX Player streams are protected and only play in MX Player’s own player. Third-party embedding is not permitted.",
   },
   ["mxplayer.in", "www.mxplayer.in", "mxplayer.tv", "www.mxplayer.tv"],
-  "MX Player streams only play inside MX Player’s own player. Cinemax can’t embed them — open the title on MX Player to watch it there.",
+  "MX Player streams only play inside MX Player’s own player. cinemaxxx can’t embed them — open the title on MX Player to watch it there.",
   (url) => url.pathname.split("/").filter(Boolean).pop() ?? null,
 );

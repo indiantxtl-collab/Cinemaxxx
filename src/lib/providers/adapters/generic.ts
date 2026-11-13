@@ -52,10 +52,10 @@ export const unknownPageAdapter: ProviderAdapter = {
   info: {
     id: "web",
     name: "This website",
-    tagline: "Cinemax plays this link through the site’s own experience.",
+    tagline: "cinemaxxx plays this link through the site’s own experience.",
     accent: "#8a93b2",
     requirements: { login: false, subscription: false, drm: false },
-    restriction: "Cinemax plays a page’s own player or a video it publishes inside the app. When a page offers neither, the original link is preserved and can be opened in your browser.",
+    restriction: "cinemaxxx plays a page’s own player or a video it publishes inside the app. When a page offers neither, the original link is preserved and can be opened in your browser.",
   },
   match() {
     return true;
@@ -68,7 +68,7 @@ export const unknownPageAdapter: ProviderAdapter = {
       playback: {
         strategy: "external",
         reason: "unsupported",
-        message: "Cinemax can’t play this site inside the app. Open the original link to watch it on the provider’s own website.",
+        message: "cinemaxxx can’t play this site inside the app. Open the original link to watch it on the provider’s own website.",
         actionLabel: "Open original link",
       },
     };

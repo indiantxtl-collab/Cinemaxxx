@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.graphics.Bitmap;
 import android.net.Uri;

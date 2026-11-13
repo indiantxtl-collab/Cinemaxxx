@@ -101,8 +101,8 @@ export default function ProviderLanding({
         </div>
 
         <p className="provider-note">
-          Cinemax never bypasses DRM, subscriptions or paywalls. When a provider permits an official player, it plays inside
-          Cinemax; otherwise the title opens on their service.
+          cinemaxxx never bypasses DRM, subscriptions or paywalls. When a provider permits an official player, it plays inside
+          cinemaxxx; otherwise the title opens on their service.
         </p>
       </div>
     </div>
