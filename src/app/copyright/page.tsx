@@ -26,7 +26,7 @@ const SECTIONS: readonly LegalSectionSpec[] = [
   { id: "ownership", title: "What this project owns" },
   { id: "not-ours", title: "What this project does not own" },
   { id: "code", title: "Source code and interface" },
-  { id: "brand-assets", title: "The CINEMAX identity assets" },
+  { id: "brand-assets", title: "The cinemaxxx identity assets" },
   { id: "limits-on-use", title: "What you may not do with this site" },
   { id: "reporting", title: "Reporting a rights concern" },
   { id: "procedure", title: "What happens after a report" },
@@ -48,14 +48,14 @@ export default function CopyrightPage() {
               <p>
                 Copyright in this website&apos;s original work — its interface design, its
                 layout and motion design, its component code, its written documentation
-                including this page, and the CINEMAX emblem, wordmark and application icon —
-                belongs to the CINEMAX project. That protection covers the expression, not
+                including this page, and the cinemaxxx emblem, wordmark and application icon —
+                belongs to the cinemaxxx project. That protection covers the expression, not
                 the ideas: a colour scheme, a rail of posters or a circle containing a logo
                 is not itself protectable subject matter.
               </p>
               <LegalFacts
                 rows={[
-                  { label: "Original artwork", value: "CINEMAX emblem, wordmark lockup, app icon, splash animation, interface icons" },
+                  { label: "Original artwork", value: "cinemaxxx emblem, wordmark lockup, app icon, splash animation, interface icons" },
                   { label: "Originals live at", value: "public/brand/, src/components/Logo.tsx, src/components/Icon.tsx" },
                   { label: "Written material", value: "The legal documents on this website, the README and the documentation in docs/" },
                   { label: "Third-party material", value: "Everything listed on /license and /attributions — not owned by this project" },
@@ -75,7 +75,7 @@ export default function CopyrightPage() {
                 <p>
                   A platform mark appears so a viewer can recognise, at a glance, where a
                   title is available. That is identification, not association: it says
-                  nothing about the relationship between CINEMAX and the platform, and the
+                  nothing about the relationship between cinemaxxx and the platform, and the
                   full statement is on <Link href="/disclaimer">Content &amp; Trademark
                   Disclaimer</Link>.
                 </p>
@@ -97,7 +97,7 @@ export default function CopyrightPage() {
               </p>
             </LegalSection>
 
-            <LegalSection id="brand-assets" title="The CINEMAX identity assets" kicker="Section 04">
+            <LegalSection id="brand-assets" title="The cinemaxxx identity assets" kicker="Section 04">
               <p>
                 The emblem, the wordmark and the app icon are used unchanged everywhere they
                 appear: the website header, the dock, the favicon, the sharing cards, the
@@ -107,7 +107,7 @@ export default function CopyrightPage() {
               </p>
               <LegalBullets
                 items={[
-                  "The emblem is not the logo of any broadcast network, including the Cinemax network, and it was not derived from one.",
+                  "The emblem is not the logo of any broadcast network, including the cinemaxxx network, and it was not derived from one.",
                   "Reusing the identity in another product, or presenting it as your own, is not permitted.",
                   "Third-party platform marks are never used as this project's own branding, and this project's mark is never used as a platform logo.",
                 ]}
@@ -119,7 +119,7 @@ export default function CopyrightPage() {
                 items={[
                   "You may not reproduce, redistribute or resell the catalogue, its artwork or its code as your own product.",
                   "You may not remove or obscure attribution, copyright notices or this page's disclosures.",
-                  "You may not use the CINEMAX identity, or any platform mark shown here, to imply a partnership or endorsement that does not exist.",
+                  "You may not use the cinemaxxx identity, or any platform mark shown here, to imply a partnership or endorsement that does not exist.",
                   "You may not use the catalogue to redistribute a film. Playback is for personal viewing of sources the studio has recorded as licensed or public domain.",
                   "You may not attempt to bypass the studio's authentication or extract another user's data.",
                 ]}

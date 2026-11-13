@@ -148,7 +148,7 @@ export default function HomePage() {
             <Link href="/watchlist">Watchlist</Link>
             <Link href="/gate-keeper">Studio</Link>
           </div>
-          <span>© {new Date().getFullYear()} Cinemax</span>
+          <span>© {new Date().getFullYear()} cinemaxxx</span>
           {/* Website-only documents. The Android shell hides this row, so the
               legal section is not surfaced inside the application. */}
           <nav className="site-footer-legal" aria-label="Legal and attribution">

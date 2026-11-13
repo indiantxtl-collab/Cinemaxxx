@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 
 const SECTIONS: readonly LegalSectionSpec[] = [
   { id: "scope", title: "Scope of this document" },
-  { id: "cinemax-brand", title: "CINEMAX and third-party brands" },
+  { id: "cinemax-brand", title: "cinemaxxx and third-party brands" },
   { id: "platforms", title: "The nineteen platforms" },
   { id: "catalogue-rights", title: "Titles, streaming rights and playback" },
   { id: "trademarks", title: "Trademarks and brand ownership" },
@@ -62,7 +62,7 @@ export default function LicensePage() {
           <article className="legal-doc">
             <LegalSection id="scope" title="Scope of this document" kicker="Section 01">
               <p>
-                This page documents how the CINEMAX catalogue presents other companies&apos;
+                This page documents how the cinemaxxx catalogue presents other companies&apos;
                 brands, artwork and software, who owns each of those things, and what the
                 presence of a name or a logo on this website actually means. It covers the
                 website you are reading; the Android application presents the same
@@ -78,7 +78,7 @@ export default function LicensePage() {
               <LegalFacts
                 rows={[
                   { label: "Document", value: "Licensing & Attribution" },
-                  { label: "Applies to", value: "The CINEMAX website and its Android application shell" },
+                  { label: "Applies to", value: "The cinemaxxx website and its Android application shell" },
                   { label: "Last reviewed", value: meta.reviewed },
                   { label: "Brand marks documented", value: `${PLATFORM_BRAND_NOTICES.length} (the ${PLATFORMS.length} platforms in the catalogue, CINEMAX included)` },
                   { label: "Legal effect", value: "This is an attribution and disclosure page. It is not a licence grant and not legal advice." },
@@ -86,23 +86,23 @@ export default function LicensePage() {
               />
             </LegalSection>
 
-            <LegalSection id="cinemax-brand" title="CINEMAX and third-party brands" kicker="Section 02">
+            <LegalSection id="cinemax-brand" title="cinemaxxx and third-party brands" kicker="Section 02">
               <p>
-                Two different things on this website are called CINEMAX, and they must not
+                Two different things on this website have similar names, and they must not
                 be confused:
               </p>
               <LegalBullets
                 items={[
                   <>
-                    <strong>This project&apos;s identity.</strong> The CINEMAX emblem (the
-                    folded-ribbon “C”), the CINEMAX wordmark, the app icon and the splash
+                    <strong>This project&apos;s identity.</strong> The cinemaxxx emblem (the
+                    folded-ribbon “C”), the cinemaxxx wordmark, the app icon and the splash
                     animation are original artwork created for this catalogue. They belong
                     to this project and appear at <code>/brand/cinemax-symbol.svg</code>,{" "}
                     <code>/brand/cinemax-app-icon.svg</code> and in{" "}
                     <code>src/components/Logo.tsx</code>.
                   </>,
                   <>
-                    <strong>The Cinemax television network.</strong> &ldquo;Cinemax&rdquo; is
+                    <strong>The CINEMAX television network.</strong> &ldquo;CINEMAX&rdquo; is
                     also the name of a premium television network owned by Home Box Office,
                     Inc., a Warner Bros. Discovery company. The platform entry named CINEMAX
                     in the platform rail uses <em>that</em> network&apos;s brand artwork, so
@@ -113,7 +113,7 @@ export default function LicensePage() {
               <LegalCallout title="Two identities, no overlap">
                 <p>
                   The artwork used for the CINEMAX platform entry is not this project&apos;s
-                  emblem, and this project&apos;s emblem is not the Cinemax network&apos;s
+                  emblem, and this project&apos;s emblem is not the cinemaxxx network&apos;s
                   logo. They were deliberately kept apart: replacing one with the other
                   would either misrepresent a third-party brand or repurpose this
                   project&apos;s own identity.
@@ -152,7 +152,7 @@ export default function LicensePage() {
 
             <LegalSection id="catalogue-rights" title="Titles, streaming rights and playback" kicker="Section 04">
               <p>
-                CINEMAX is a catalogue and a player, not a rights holder. It does not sell,
+                cinemaxxx is a catalogue and a player, not a rights holder. It does not sell,
                 sublicense or redistribute commercial films or series. Each title&apos;s
                 availability is whatever the studio that added it recorded, and the
                 catalogue shows that record rather than guessing:
@@ -162,7 +162,7 @@ export default function LicensePage() {
                   <>
                     A title recorded as <strong>available on an external platform</strong>{" "}
                     opens that platform&apos;s own page and player. The stream never passes
-                    through CINEMAX.
+                    through cinemaxxx.
                   </>,
                   <>
                     A title recorded as <strong>licensed for playback here</strong> plays the
@@ -341,9 +341,9 @@ export default function LicensePage() {
             <LegalSection id="external" title="External resources and links" kicker="Section 11">
               <p>
                 Selecting a platform, opening a trailer hosted elsewhere, or following a link
-                out of CINEMAX takes you to a service this project does not control. Those
+                out of cinemaxxx takes you to a service this project does not control. Those
                 services set their own cookies, log their own requests and apply their own
-                terms and privacy policies. CINEMAX does not receive, store or share your
+                terms and privacy policies. cinemaxxx does not receive, store or share your
                 account details from them, and a link does not imply a relationship with the
                 destination.
               </p>
@@ -360,7 +360,7 @@ export default function LicensePage() {
                 <p>
                   The presence of a platform name or logo on this website means one thing
                   only: titles in this catalogue can be watched there. It does not mean that
-                  the platform has partnered with CINEMAX, licensed anything to it, sponsored
+                  the platform has partnered with cinemaxxx, licensed anything to it, sponsored
                   it, reviewed it, or endorsed it. No such agreements exist, and none is
                   claimed anywhere in this site, its metadata or its sharing cards.
                 </p>

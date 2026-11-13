@@ -30,7 +30,7 @@ export default function Logo({ className = "", emblemOnly = false }: { className
   return (
     <span className={`cinemax-logo ${className}`}>
       <CinemaxEmblem />
-      {!emblemOnly && <span className="logo-wordmark">cinema<span className="logo-x">x</span></span>}
+      {!emblemOnly && <span className="logo-wordmark">cinema<span className="logo-x">xxx</span></span>}
     </span>
   );
 }

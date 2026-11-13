@@ -134,7 +134,7 @@ async function handleMediaRequest(req: NextRequest, segments: string[], headOnly
       "WEBVTT",
       "",
       "00:00:00.000 --> 00:00:08.000",
-      `Cinemax Verified Archival Presentation — ${titleLabel}`,
+      `cinemaxxx Verified Archival Presentation — ${titleLabel}`,
       "",
       "00:00:08.000 --> 00:00:25.000",
       "Restored public-domain and open-license cinema stream.",
@@ -165,7 +165,7 @@ async function handleMediaRequest(req: NextRequest, segments: string[], headOnly
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${titleLabel} — Cinemax Archival Embed</title>
+  <title>${titleLabel} — cinemaxxx Archival Embed</title>
   <style>
     html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #05060b; color: #f5f7ff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
     .embed-stage { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #05060b; }

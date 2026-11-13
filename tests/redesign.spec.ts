@@ -84,9 +84,10 @@ test("layouts stay within desktop, mobile and 320px screens; navigation survives
     await expect(sheet.getByRole("heading", { name: "Popular Languages", exact: true })).toBeVisible();
     await expect(sheet.getByRole("heading", { name: "Popular Genres", exact: true })).toBeVisible();
     await expect(sheet.getByRole("heading", { name: "Collections", exact: true })).toBeVisible();
-    // No sports, TV channels, broadcasting channels, or gaming categories exist.
+    // The fork adds managed non-explicit channels; the old sports/gaming ban
+    // must not reject the new, database-backed channel categories.
     const sheetText = await sheet.innerText();
-    expect(sheetText).not.toMatch(/\b(Sports|Live TV|TV Channels|Broadcasting|Gaming)\b/i);
+    expect(sheetText).not.toMatch(/\b(Sports|Gaming)\b/i);
     // Close button closes the sheet cleanly.
     await sheet.getByRole("button", { name: "Close More panel" }).click();
     await expect(sheet).toHaveCount(0);
@@ -185,7 +186,7 @@ test("unavailable catalogue is explicit and never replaced with mock titles", as
 test("intro: cinematic first-home reveal exits cleanly and is not repeated", async ({ page }, info) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   if (info.project.name !== "reduced-motion") {
-    const intro = page.getByRole("dialog", { name: "Opening Cinemax" });
+    const intro = page.getByRole("dialog", { name: "Opening cinemaxxx" });
     await expect(intro).toBeVisible();
     await page.getByRole("button", { name: "Skip intro" }).click({ force: true });
     await expect(intro).toHaveCount(0);

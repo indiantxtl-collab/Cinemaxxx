@@ -212,7 +212,7 @@ export default function PrivacyPage() {
               <p>
                 The shared link points at the title&apos;s page on this website and contains
                 the title id, nothing else about you. A generated preview image is built by
-                this deployment from the title&apos;s own poster and the CINEMAX mark. Nothing
+                this deployment from the title&apos;s own poster and the cinemaxxx mark. Nothing
                 is shared until you confirm it.
               </p>
             </LegalSection>

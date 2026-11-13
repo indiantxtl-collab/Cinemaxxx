@@ -5,6 +5,9 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || !process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+      return NextResponse.json({ error: "Admin authentication is not configured on this deployment." }, { status: 503 });
+    }
     const { email, password } = await req.json();
     if (!validateCredentials(email, password)) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

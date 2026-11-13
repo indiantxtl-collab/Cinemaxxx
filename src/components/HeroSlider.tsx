@@ -142,13 +142,13 @@ export default function HeroSlider() {
 
   if (!feature)
     return (
-      <section className="hero-card hero-empty" aria-label="Cinemax library" ref={attachHero}>
+      <section className="hero-card hero-empty" aria-label="cinemaxxx library" ref={attachHero}>
         <Artwork src="/cinemax-atmosphere.webp" className="hero-image" kind="backdrop" priority />
         <div className="hero-vignette" />
         <div className="hero-copy">
           <Logo className="hero-empty-logo" />
           <h1 className="hero-title">{error ? "Library unavailable" : "Your library is ready"}</h1>
-          <p className="hero-empty-copy">{error || "Add your first titles in the Cinemax studio."}</p>
+          <p className="hero-empty-copy">{error || "Add your first titles in the cinemaxxx studio."}</p>
           <div className="hero-actions">
             {error ? (
               <CinematicButton onClick={refresh} icon={<Icon name="refresh" />}>

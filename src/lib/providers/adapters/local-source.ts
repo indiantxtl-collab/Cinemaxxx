@@ -34,8 +34,8 @@ export function isLocalSourcePath(raw: string): boolean {
 export const localSourceAdapter: ProviderAdapter = {
   info: {
     id: "local-media",
-    name: "Cinemax library",
-    tagline: "Media served by the Cinemax library.",
+    name: "cinemaxxx library",
+    tagline: "Media served by the cinemaxxx library.",
     accent: "#4fd8ff",
     requirements: { login: false, subscription: false, drm: false },
   },
@@ -53,7 +53,7 @@ export const localSourceAdapter: ProviderAdapter = {
         playback: {
           strategy: "embed",
           src: path,
-          embedTitle: "Cinemax Archival Embed Player",
+          embedTitle: "cinemaxxx Archival Embed Player",
         },
       };
     }

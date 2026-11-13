@@ -13,17 +13,19 @@ import EmptyState from "@/components/EmptyState";
 import CinematicButton from "@/components/CinematicButton";
 
 export default function CategoriesPage() {
-  const { movies, categories, loading, error, refresh } = useCatalogue();
+  const { movies, categories, channels, loading, error, refresh } = useCatalogue();
+  const enabledCategories = categories.filter((category) => category.enabled);
+  const managedSlugs = useMemo(() => new Set(categories.map((category) => category.slug)), [categories]);
 
   const collectionsBySlug = useMemo(() => {
     const map = new Map<
       string,
-      { id: string; slug: string; name: string; titles: typeof movies; image?: string | null }
+      { id: string; slug: string; name: string; titles: typeof movies; image?: string | null; channelCount: number }
     >();
 
     const allSpecs = [
-      ...COLLECTION_SPECS.map((s) => ({ slug: s.slug, name: s.name })),
-      ...categories.map((c) => ({ slug: c.slug, name: c.name })),
+      ...enabledCategories.map((c) => ({ slug: c.slug, name: c.name })),
+      ...COLLECTION_SPECS.filter((s) => !managedSlugs.has(s.slug)).map((s) => ({ slug: s.slug, name: s.name })),
       // Platform tokens live in the same catalogue field, but they are not
       // content categories — they are surfaced by the home platform rail.
       ...[
@@ -41,20 +43,24 @@ export default function CategoriesPage() {
 
     for (const item of allSpecs) {
       const slug = item.slug.toLowerCase();
+      if (managedSlugs.has(slug) && !enabledCategories.some((category) => category.slug === slug)) continue;
       if (map.has(slug)) continue;
+      const managed = enabledCategories.find((category) => category.slug === slug);
       const titles = movies.filter((movie) => matchesCollection(movie, slug));
-      if (titles.length === 0) continue;
+      const numberOfChannels = managed ? channels.filter((channel) => channel.categoryId === managed.id).length : 0;
+      if (titles.length === 0 && numberOfChannels === 0) continue;
       const artwork = titles.find((movie) => movie.backdropUrl) ?? titles[0];
       map.set(slug, {
         id: slug,
         slug,
         name: item.name,
         titles,
-        image: artwork?.backdropUrl || artwork?.posterUrl,
+        channelCount: numberOfChannels,
+        image: artwork?.backdropUrl || artwork?.posterUrl || channels.find((channel) => channel.categoryId === managed?.id && channel.logoUrl)?.logoUrl,
       });
     }
     return map;
-  }, [movies, categories]);
+  }, [movies, enabledCategories, managedSlugs, channels]);
 
   const collections = useMemo(() => Array.from(collectionsBySlug.values()), [collectionsBySlug]);
   const spotlights = useMemo(
@@ -66,20 +72,25 @@ export default function CategoriesPage() {
   );
 
   const groupedSections = useMemo(() => {
-    return CATEGORY_BROWSER_SECTIONS.map((section) => ({
+    const sections = CATEGORY_BROWSER_SECTIONS.map((section) => ({
       ...section,
       items: section.items
+        .filter((item) => !managedSlugs.has(item.slug))
         .map((item) => {
           const entry = collectionsBySlug.get(item.slug);
           if (!entry) return null;
           return {
             ...entry,
-            name: item.label,
+            name: collectionsBySlug.get(item.slug)?.name ?? item.label,
           };
         })
         .filter((item): item is NonNullable<typeof item> => item !== null),
     })).filter((section) => section.items.length > 0);
-  }, [collectionsBySlug]);
+    const managed = enabledCategories.map((category) => collectionsBySlug.get(category.slug))
+      .filter((item): item is NonNullable<typeof item> => Boolean(item));
+    if (managed.length) sections.unshift({ id: "managed-categories", title: "Categories", items: managed });
+    return sections;
+  }, [collectionsBySlug, enabledCategories, managedSlugs]);
 
   return (
     <main className="secondary-page explore-page" id="main-content" tabIndex={-1}>
@@ -128,7 +139,7 @@ export default function CategoriesPage() {
                         <Icon name={collectionIcon(item.slug)} />
                       </span>
                       <h2>{item.name}</h2>
-                      <span className="collection-count">{item.titles.length} titles</span>
+                      <span className="collection-count">{item.titles.length + item.channelCount} titles</span>
                     </div>
                     <span className="collection-arrow">
                       <Icon name="arrow-right" />
@@ -151,7 +162,7 @@ export default function CategoriesPage() {
                         slug: item.slug,
                         label: item.name,
                         href: `/category/${encodeURIComponent(item.slug)}`,
-                        count: item.titles.length,
+                        count: item.titles.length + item.channelCount,
                         image: item.image,
                       }}
                     />

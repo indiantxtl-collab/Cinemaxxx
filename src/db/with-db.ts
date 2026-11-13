@@ -11,8 +11,8 @@ import { ensureSchema } from "@/db/ensure-schema";
  *     Postgres produces when it drops an idle socket.
  */
 export async function withDb<T>(run: (db: NodePgDatabase) => Promise<T>): Promise<T> {
-  // `ensureSchema` resolves with a report instead of throwing: a database that
-  // refuses DDL (read-only branch, restricted role) should still serve reads.
+  // Schema setup must succeed before serving or writing records. In particular,
+  // a missing channel/logo relationship must never look like an empty library.
   await ensureSchema();
   try {
     return await run(getDb());

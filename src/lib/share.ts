@@ -18,7 +18,10 @@
  */
 
 /** The official origin. Never a deployment preview hostname. */
-export const SHARE_SITE_URL = "https://cinemaxtv.space";
+export const SHARE_SITE_URL = (() => {
+  const configured = (process.env.NEXT_PUBLIC_SITE_URL ?? "").trim();
+  try { return configured ? new URL(configured).origin : ""; } catch { return ""; }
+})();
 
 export interface ShareableTitle {
   id: number;
@@ -55,7 +58,7 @@ export function currentOrigin(): string {
   if (!origin) return SHARE_SITE_URL;
   try {
     const host = new URL(origin).hostname.toLowerCase();
-    if (host === "localhost" || host.endsWith(".vercel.app") || host === "127.0.0.1") return SHARE_SITE_URL;
+    if (host === "localhost" || host.endsWith(".vercel.app") || host === "127.0.0.1") return SHARE_SITE_URL || origin;
     return origin.replace(/\/$/, "");
   } catch {
     return SHARE_SITE_URL;
@@ -92,7 +95,7 @@ export function trailerTarget(rawUrl: string | null | undefined): TrailerTarget 
   }
 
   try {
-    const url = new URL(raw, SHARE_SITE_URL);
+    const url = new URL(raw, SHARE_SITE_URL || currentOrigin());
     const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (host === "youtu.be" || host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
       const id = host === "youtu.be"
@@ -128,7 +131,7 @@ export function trailerTarget(rawUrl: string | null | undefined): TrailerTarget 
 
 function absolute(value: string): string {
   if (/^https?:\/\//i.test(value)) return value;
-  return `${SHARE_SITE_URL}${value.startsWith("/") ? "" : "/"}${value}`;
+  return `${SHARE_SITE_URL || currentOrigin()}${value.startsWith("/") ? "" : "/"}${value}`;
 }
 
 /** "Type · Year · Genre", omitting whatever the record does not have. */
@@ -153,14 +156,14 @@ export function shareMessage(movie: ShareableTitle): string {
   const summary = (movie.description ?? "").trim().replace(/\s+/g, " ");
   if (!summary) {
     // A record with no description still needs one readable sentence.
-    return `Watch ${movie.title} on CINEMAX.`;
+    return `Watch ${movie.title} on cinemaxxx.`;
   }
   const clipped = summary.length > 160 ? `${summary.slice(0, 157).trimEnd()}…` : summary;
   return clipped;
 }
 
 export function shareSubject(movie: ShareableTitle): string {
-  return `${movie.title} on CINEMAX`;
+  return `${movie.title} on cinemaxxx`;
 }
 
 /** Description used by Open Graph / the share card page. */
@@ -169,7 +172,7 @@ export function shareDescription(movie: ShareableTitle): string {
   const summary = (movie.description ?? "").trim().replace(/\s+/g, " ");
   const clipped = summary.length > 180 ? `${summary.slice(0, 177).trimEnd()}…` : summary;
   const head = subtitle ? `${movie.title} (${subtitle})` : movie.title;
-  return clipped ? `${head} — ${clipped}` : `${head} — watch it on CINEMAX.`;
+  return clipped ? `${head} — ${clipped}` : `${head} — watch it on cinemaxxx.`;
 }
 
 /* --------------------------------------------------------------- the shell */

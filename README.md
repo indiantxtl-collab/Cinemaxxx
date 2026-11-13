@@ -145,7 +145,7 @@ to run against a database that already holds data.
 ```bash
 # against a local dev server
 npm run dev &
-BASE_URL=http://localhost:3000 ADMIN_EMAIL=admin@cinemax.com ADMIN_PASSWORD=... npm run verify:api
+BASE_URL=http://localhost:3000 ADMIN_EMAIL="$ADMIN_EMAIL" ADMIN_PASSWORD="$ADMIN_PASSWORD" npm run verify:api   # your own configured identity; never commit it
 
 # against a deployment
 BASE_URL=https://your-app.vercel.app ADMIN_EMAIL=... ADMIN_PASSWORD=... npm run verify:api
@@ -183,8 +183,8 @@ npm run licenses                        # dependency licence report
 
 The Share button on a title screen, and the share control on `/share/<id>`, run
 one code path (`src/lib/share.ts`). A share carries **one** link and **one** card:
-the link is the destination (`https://cinemaxtv.space/share/<id>`, never a
-deployment hostname), the receiving app renders the card from that page's Open
+the link is the destination (`<NEXT_PUBLIC_SITE_URL>/share/<id>`, the origin you
+configure for this deployment), the receiving app renders the card from that page's Open
 Graph tags, and the message text is the title's description — not a second copy
 of the title, not a raw address, not a trailer URL.
 
@@ -216,7 +216,7 @@ downloads anything by itself, and a dismissal is remembered on the device
 desktop and unsupported devices get an availability note. Inside the app it does
 not appear at all.
 
-`/download/android` answers with `public/downloads/Cinemax-1.1.0.apk` directly —
+`/download/android` answers with `public/downloads/cinemaxxx-1.1.0.apk` directly —
 `application/vnd.android.package-archive`, `attachment; filename=…`, no redirect.
 `npm run verify:promo` reads the package id, version and signature out of that
 file and fails if it disagrees with the site.
@@ -224,8 +224,8 @@ file and fails if it disagrees with the site.
 ## Android app
 
 The repository also ships a real, installable Android app
-(`android/dist/Cinemax-1.1.0.apk`, package `com.cinemax.app`). It is a native
-shell around this same deployment — `https://cinemaxtv.space` — so the
+(`android/dist/cinemaxxx-1.1.0.apk`, package `com.cinemaxxx.app`). It is a native
+shell around the deployment you configure with `CINEMAXXX_SITE_URL` — so the
 existing web app, API routes, PostgreSQL data, studio/admin panel, authentication
 and playback all run unchanged. The app adds a native splash, app icon, adaptive
 + legacy launcher icons, edge-to-edge inset handling, back-button behaviour,
@@ -243,16 +243,16 @@ paint, and stops drawing frames as soon as it has settled.
 ![The Cinemax splash, frame by frame](docs/android-splash/timeline.png)
 
 ```bash
-bash android/build.sh            # signed APK → android/dist/Cinemax-1.1.0.apk
-bash android/tests/run-tests.sh  # 158 JVM + 64 DOM + 100 APK checks
+bash android/build.sh            # signed APK → android/dist/cinemaxxx-1.1.0.apk
+bash android/tests/run-tests.sh  # 228 JVM + 73 DOM + 317 brand + 110 APK checks
 bash android/tools/preview-splash.sh   # render the splash offline (no device)
-adb install -r android/dist/Cinemax-1.1.0.apk
+adb install -r android/dist/cinemaxxx-1.1.0.apk
 ```
 
 Gradle-free and SDK-manager-free: the build fetches a pinned, checksum-verified
 toolchain. The same build runs in CI on every push and pull request, and the
-finished `Cinemax-1.1.0.apk` (with its SHA-256) is attached to the run as the
-`cinemax-android-apk` artifact — download it from the *Actions* tab and open it
+finished `cinemaxxx-1.1.0.apk` (with its SHA-256) is attached to the run as the
+`cinemaxxx-android-apk` artifact — download it from the *Actions* tab and open it
 on the device. Full details, the design system, device verification steps and
 the remaining notes live in [android/README.md](android/README.md).
 

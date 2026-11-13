@@ -11,7 +11,7 @@
 #
 # shell-dom.test.mjs resolves it from there, so `bash android/tests/run-tests.sh`
 # picks the layer up automatically once this script has run. Without jsdom the
-# DOM layer self-skips (unless CINEMAX_REQUIRE_JSDOM=1, which turns the skip
+# DOM layer self-skips (unless CINEMAXXX_REQUIRE_JSDOM=1, which turns the skip
 # into a failure - used by CI so a missing dependency can never hide a
 # regression).
 #
@@ -22,9 +22,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT="$(dirname "$SCRIPT_DIR")"
-CACHE="${CINEMAX_TOOLCHAIN:-$PROJECT/.toolchain}"
+CACHE="${CINEMAXXX_TOOLCHAIN:-$PROJECT/.toolchain}"
 TARGET="$CACHE/tests/node_modules/jsdom"
-JSDOM_VERSION="${CINEMAX_JSDOM_VERSION:-26.1.0}"
+JSDOM_VERSION="${CINEMAXXX_JSDOM_VERSION:-26.1.0}"
 
 log() { printf '\033[1;35m[test-deps]\033[0m %s\n' "$1"; }
 fail() { printf '\033[1;31m[test-deps] %s\033[0m\n' "$1" >&2; exit 1; }

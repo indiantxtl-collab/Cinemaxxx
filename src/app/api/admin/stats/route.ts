@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { categories, movies, slides, watchlist } from "@/db/schema";
+import { categories, channels, movies, slides, watchlist } from "@/db/schema";
 import { describeDbError, withDb } from "@/db/with-db";
 import { getSchemaReport } from "@/db/ensure-schema";
 import { isAdmin, unauthorized } from "@/lib/api";
@@ -15,11 +15,13 @@ export async function GET(req: NextRequest) {
       const [movieCount] = await db.select({ count: sql<number>`count(*)` }).from(movies);
       const [slideCount] = await db.select({ count: sql<number>`count(*)` }).from(slides);
       const [catCount] = await db.select({ count: sql<number>`count(*)` }).from(categories);
+      const [channelCount] = await db.select({ count: sql<number>`count(*)` }).from(channels);
       const [wlCount] = await db.select({ count: sql<number>`count(*)` }).from(watchlist);
       return {
         movies: Number(movieCount.count),
         slides: Number(slideCount.count),
         categories: Number(catCount.count),
+        channels: Number(channelCount.count),
         watchlistItems: Number(wlCount.count),
       };
     });

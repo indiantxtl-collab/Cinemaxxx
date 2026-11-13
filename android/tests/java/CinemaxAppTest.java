@@ -1,6 +1,6 @@
-import com.cinemax.app.NavigationPolicy;
-import com.cinemax.app.NavigationPolicy.Decision;
-import com.cinemax.app.SplashMotion;
+import com.cinemaxxx.app.NavigationPolicy;
+import com.cinemaxxx.app.NavigationPolicy.Decision;
+import com.cinemaxxx.app.SplashMotion;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,10 +64,10 @@ public final class CinemaxAppTest {
         section("NavigationPolicy");
 
         decide("https", HOST, STAY, "production https stays in the app");
-        decide("HTTPS", "CINEMAXTV.SPACE", STAY, "host and scheme matching is case-insensitive");
-        decide("https", "www.cinemaxtv.space", STAY, "the www form of the official host stays in the app");
-        decide("https", "cinemax-orpin.vercel.app", STAY, "the deployment host earlier builds used stays in the app");
-        decide("https", "cinemax-orpin-git-main-raghav549.vercel.app", STAY, "Vercel preview alias stays in the app");
+        decide("HTTPS", HOST.toUpperCase(java.util.Locale.ROOT), STAY, "host and scheme matching is case-insensitive");
+        decide("https", "www." + HOST, STAY, "the www form of the official host stays in the app");
+        decide("https", "cinemax-orpin.vercel.app", LEAVE, "the original deployment is external to this independent app");
+        decide("https", "unrelated.vercel.app", LEAVE, "an unrelated deployment stays outside the app");
         decide(null, null, STAY, "relative same-origin navigation stays in the app");
         decide("about", null, STAY, "about:blank stays in the app");
         decide("blob", HOST, STAY, "blob documents stay in the app");
@@ -114,7 +114,7 @@ public final class CinemaxAppTest {
     private static void injectionChecks(String outputDirectory) throws Exception {
         section("AppTheme injection");
 
-        Class<?> appTheme = Class.forName("com.cinemax.app.AppTheme");
+        Class<?> appTheme = Class.forName("com.cinemaxxx.app.AppTheme");
         Method buildScript = appTheme.getDeclaredMethod("buildScript", String.class);
         buildScript.setAccessible(true);
 
@@ -126,7 +126,7 @@ public final class CinemaxAppTest {
         check(theme.length() > 4000, "app-theme.css asset is present (" + theme.length() + " bytes)");
         check(!splashLayout.contains("cinemax_splash_spinner"), "the native splash has no generic spinner");
         check(!strings.contains("Starting Cinemax"), "the native splash has no generic loading copy");
-        check(splashLayout.contains("com.cinemax.app.CinemaxSplashView") && splashLayout.contains("cinemax_splash_stage"),
+        check(splashLayout.contains("com.cinemaxxx.app.CinemaxSplashView") && splashLayout.contains("cinemax_splash_stage"),
                 "the native splash hosts the layered reveal canvas");
         check(shell.length() > 2000, "app-shell.js asset is present (" + shell.length() + " bytes)");
         check(theme.contains("html[data-cinemax-app=\"android\"]"), "the theme is scoped to the app attribute");
@@ -504,16 +504,16 @@ public final class CinemaxAppTest {
         section("native splash resources and launch gating");
 
         String layout = read(new File(projectDirectory, "app/src/main/res/layout/activity_main.xml"));
-        String mainActivity = read(new File(projectDirectory, "app/src/main/java/com/cinemax/app/MainActivity.java"));
+        String mainActivity = read(new File(projectDirectory, "app/src/main/java/com/cinemaxxx/app/MainActivity.java"));
         String splashView = withoutComments(
-                read(new File(projectDirectory, "app/src/main/java/com/cinemax/app/CinemaxSplashView.java")));
+                read(new File(projectDirectory, "app/src/main/java/com/cinemaxxx/app/CinemaxSplashView.java")));
         String motion = withoutComments(
-                read(new File(projectDirectory, "app/src/main/java/com/cinemax/app/SplashMotion.java")));
+                read(new File(projectDirectory, "app/src/main/java/com/cinemaxxx/app/SplashMotion.java")));
         String emblem = read(new File(projectDirectory, "app/src/main/res/drawable/cinemax_emblem.xml"));
         String windowBackground = read(new File(projectDirectory, "app/src/main/res/drawable/cinemax_window_background.xml"));
         String strings = read(new File(projectDirectory, "app/src/main/res/values/strings.xml"));
 
-        check(layout.contains("com.cinemax.app.CinemaxSplashView"), "the splash stage is a single composited view");
+        check(layout.contains("com.cinemaxxx.app.CinemaxSplashView"), "the splash stage is a single composited view");
         check(layout.contains("android:background=\"@color/cinemax_ink\""),
                 "the splash layer stays a flat near-black canvas");
         check(splashView.contains("R.drawable.cinemax_emblem"),
@@ -559,8 +559,8 @@ public final class CinemaxAppTest {
                 "CINEMAX selections persist as platform tokens like every other platform");
 
         // The lockup: the logo plus the CINEMAX wordmark revealed beneath it.
-        check(splashView.contains("drawText") && splashView.contains("\"CINEMAX\""),
-                "the reveal draws the CINEMAX wordmark beneath the logo");
+        check(splashView.contains("drawText") && splashView.contains("\"cinemaxxx\""),
+                "the reveal draws the cinemaxxx wordmark beneath the logo");
         check(splashView.contains("Typeface.createFromAsset"),
                 "the wordmark uses the brand face shipped with the app");
         check(new File(projectDirectory, "app/src/main/assets/cinemax/fonts/outfit-semibold.ttf").isFile(),
@@ -644,7 +644,7 @@ public final class CinemaxAppTest {
     private static void scrollPerformanceChecks() throws Exception {
         section("scroll performance (native + injected layer)");
 
-        String mainActivity = read(new File(projectDirectory, "app/src/main/java/com/cinemax/app/MainActivity.java"));
+        String mainActivity = read(new File(projectDirectory, "app/src/main/java/com/cinemaxxx/app/MainActivity.java"));
         String theme = read(asset("app-theme.css"));
         String shell = read(asset("app-shell.js"));
 
@@ -717,10 +717,10 @@ public final class CinemaxAppTest {
     private static void sharingChecks() throws Exception {
         section("native sharing");
 
-        String bridge = source("app/src/main/java/com/cinemax/app/CinemaxBridge.java");
-        String launcher = source("app/src/main/java/com/cinemax/app/ShareLauncher.java");
-        String provider = source("app/src/main/java/com/cinemax/app/ShareFileProvider.java");
-        String activity = source("app/src/main/java/com/cinemax/app/MainActivity.java");
+        String bridge = source("app/src/main/java/com/cinemaxxx/app/CinemaxBridge.java");
+        String launcher = source("app/src/main/java/com/cinemaxxx/app/ShareLauncher.java");
+        String provider = source("app/src/main/java/com/cinemaxxx/app/ShareFileProvider.java");
+        String activity = source("app/src/main/java/com/cinemaxxx/app/MainActivity.java");
         String manifest = read(new File(projectDirectory, "app/src/main/AndroidManifest.xml"));
 
         check(bridge.contains("public void share(") && bridge.contains("@JavascriptInterface"),
@@ -748,7 +748,7 @@ public final class CinemaxAppTest {
                 "the provider refuses any path outside the share cache");
         check(provider.contains("MODE_READ_ONLY"), "shared files are read-only");
 
-        check(manifest.contains("com.cinemax.app.ShareFileProvider"),
+        check(manifest.contains("com.cinemaxxx.app.ShareFileProvider"),
                 "the provider is declared in the manifest");
         check(manifest.contains("android:grantUriPermissions=\"true\""),
                 "URI permission grants are allowed for the provider");
@@ -774,8 +774,8 @@ public final class CinemaxAppTest {
         check(!NavigationPolicy.isWebsiteOnlyPath("/"), "the home surface is untouched");
         check(!NavigationPolicy.isWebsiteOnlyPath(null), "a missing path is not a website-only document");
 
-        String client = source("app/src/main/java/com/cinemax/app/CinemaxWebViewClient.java");
-        String activity = source("app/src/main/java/com/cinemax/app/MainActivity.java");
+        String client = source("app/src/main/java/com/cinemaxxx/app/CinemaxWebViewClient.java");
+        String activity = source("app/src/main/java/com/cinemaxxx/app/MainActivity.java");
         String theme = read(asset("app-theme.css"));
 
         check(client.contains("isWebsiteOnlyPath"), "in-app navigation cancels those documents");
@@ -790,12 +790,12 @@ public final class CinemaxAppTest {
         // NavigationPolicy is excluded on purpose: naming the paths it cancels is
         // its entire job.
         String[] ownSources = {
-                "app/src/main/java/com/cinemax/app/MainActivity.java",
-                "app/src/main/java/com/cinemax/app/CinemaxBridge.java",
-                "app/src/main/java/com/cinemax/app/CinemaxWebViewClient.java",
-                "app/src/main/java/com/cinemax/app/ShareLauncher.java",
-                "app/src/main/java/com/cinemax/app/ShareFileProvider.java",
-                "app/src/main/java/com/cinemax/app/CinemaxChromeClient.java",
+                "app/src/main/java/com/cinemaxxx/app/MainActivity.java",
+                "app/src/main/java/com/cinemaxxx/app/CinemaxBridge.java",
+                "app/src/main/java/com/cinemaxxx/app/CinemaxWebViewClient.java",
+                "app/src/main/java/com/cinemaxxx/app/ShareLauncher.java",
+                "app/src/main/java/com/cinemaxxx/app/ShareFileProvider.java",
+                "app/src/main/java/com/cinemaxxx/app/CinemaxChromeClient.java",
                 "app/src/main/assets/cinemax/app-shell.js",
         };
         boolean linksToLegal = false;

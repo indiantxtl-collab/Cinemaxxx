@@ -1,3 +1,5 @@
+import { resolveShareLink } from "@/lib/providers";
+
 /**
  * Normalizes records returned from Drizzle / pg and validates incoming payloads
  * so every API endpoint speaks the same camelCase shape.
@@ -84,6 +86,23 @@ export type CategoryRow = {
   id: number;
   name: string;
   slug: string;
+  sortOrder: number;
+  enabled: boolean;
+};
+
+export type ChannelRow = {
+  id: number;
+  categoryId: number;
+  categoryName: string;
+  categorySlug: string;
+  name: string;
+  description: string;
+  streamUrl: string;
+  logoUrl: string | null;
+  sortOrder: number;
+  enabled: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
 };
 
 export type WatchlistRow = {
@@ -243,6 +262,28 @@ export function normalizeCategory(row: AnyRecord): CategoryRow {
     id: int(row.id, 0),
     name: str(row.name, ""),
     slug: str(row.slug, ""),
+    sortOrder: int(pick(row, "sortOrder", "sort_order"), 0),
+    enabled: bool(row.enabled, true),
+  };
+}
+
+export function normalizeChannel(row: AnyRecord): ChannelRow {
+  const channel = (row.channel as AnyRecord | undefined) ?? row;
+  const id = int(channel.id, 0);
+  const logoVersion = iso(pick(row, "logoUpdatedAt"));
+  return {
+    id,
+    categoryId: int(pick(channel, "categoryId", "category_id"), 0),
+    categoryName: str(row.categoryName, ""),
+    categorySlug: str(row.categorySlug, ""),
+    name: str(channel.name),
+    description: str(channel.description),
+    streamUrl: str(pick(channel, "streamUrl", "stream_url")),
+    logoUrl: logoVersion ? `/api/channels/${id}/logo?v=${encodeURIComponent(logoVersion)}` : null,
+    sortOrder: int(pick(channel, "sortOrder", "sort_order"), 0),
+    enabled: bool(channel.enabled, true),
+    createdAt: iso(pick(channel, "createdAt", "created_at")),
+    updatedAt: iso(pick(channel, "updatedAt", "updated_at")),
   };
 }
 
@@ -438,13 +479,114 @@ export function slugify(input: string): string {
 export type CategoryInput = {
   name: string;
   slug: string;
-  sortOrder?: number;
+  sortOrder: number;
+  enabled: boolean;
 };
 
 export function categoryInput(raw: AnyRecord): CategoryInput {
   const name = str(raw.name).trim();
   if (!name) throw new ValidationError("Category name is required");
+  if (name.length > 100) throw new ValidationError("Category name must be 100 characters or fewer");
   const slug = slugify(str(raw.slug).trim() || name);
-  if (!slug) throw new ValidationError("Category slug cannot be empty");
-  return { name: name.slice(0, 100), slug: slug.slice(0, 100) };
+  if (!slug || slug.length > 100) throw new ValidationError("Category slug must be 1–100 lowercase letters, numbers or hyphens");
+  return { name, slug, sortOrder: orderValue(raw.sortOrder, 0), enabled: booleanValue(raw.enabled, true) };
+}
+
+function booleanValue(value: unknown, fallback: boolean): boolean {
+  if (value === undefined) return fallback;
+  if (typeof value !== "boolean") throw new ValidationError("Enabled must be true or false");
+  return value;
+}
+
+function orderValue(value: unknown, fallback: number): number {
+  if (value === undefined) return fallback;
+  const number = typeof value === "number" || typeof value === "string" && value.trim() ? Number(value) : Number.NaN;
+  if (!Number.isSafeInteger(number) || number < 0 || number > 2147483647) {
+    throw new ValidationError("Sort order must be a whole number from 0 to 2147483647");
+  }
+  return number;
+}
+
+function positiveId(value: unknown): number {
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number <= 0 || number > 2147483647) {
+    throw new ValidationError("Choose an existing category");
+  }
+  return number;
+}
+
+export function categoryPatch(raw: AnyRecord): Partial<CategoryInput> {
+  const patch: Partial<CategoryInput> = {};
+  if ("name" in raw) {
+    const name = str(raw.name).trim();
+    if (!name || name.length > 100) throw new ValidationError("Category name must be 1–100 characters");
+    patch.name = name;
+  }
+  if ("slug" in raw || "name" in raw) {
+    const slug = slugify(str(raw.slug).trim() || patch.name || "");
+    if (!slug || slug.length > 100) throw new ValidationError("Category slug must be 1–100 lowercase letters, numbers or hyphens");
+    patch.slug = slug;
+  }
+  if ("sortOrder" in raw) patch.sortOrder = orderValue(raw.sortOrder, 0);
+  if ("enabled" in raw) patch.enabled = booleanValue(raw.enabled, true);
+  if (!Object.keys(patch).length) throw new ValidationError("No fields to update");
+  return patch;
+}
+
+export type ChannelInput = {
+  categoryId: number;
+  name: string;
+  description: string;
+  streamUrl: string;
+  sortOrder: number;
+  enabled: boolean;
+};
+
+function streamUrlValue(value: unknown): string {
+  const input = str(value).trim();
+  if (!input || input.length > 4096) throw new ValidationError("A stream URL of up to 4096 characters is required");
+  let url: URL;
+  try { url = new URL(input); } catch { throw new ValidationError("Enter a valid HTTP(S) stream URL"); }
+  if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) {
+    throw new ValidationError("Stream URLs must use HTTP(S) without embedded credentials");
+  }
+  const resolution = resolveShareLink(input);
+  if (!resolution.ok || resolution.playback.strategy !== "direct") {
+    throw new ValidationError("Use a direct video, HLS or DASH stream URL, not a watch page or subscription link");
+  }
+  return input;
+}
+
+export function channelInput(raw: AnyRecord): ChannelInput {
+  const name = str(raw.name).trim();
+  if (!name || name.length > 200) throw new ValidationError("Channel name must be 1–200 characters");
+  const description = str(raw.description).trim();
+  if (description.length > 2000) throw new ValidationError("Description must be 2000 characters or fewer");
+  return {
+    categoryId: positiveId(pick(raw, "categoryId", "category_id")),
+    name,
+    description,
+    streamUrl: streamUrlValue(pick(raw, "streamUrl", "stream_url")),
+    sortOrder: orderValue(pick(raw, "sortOrder", "sort_order"), 0),
+    enabled: booleanValue(raw.enabled, true),
+  };
+}
+
+export function channelPatch(raw: AnyRecord): Partial<ChannelInput> {
+  const patch: Partial<ChannelInput> = {};
+  if ("name" in raw) {
+    const name = str(raw.name).trim();
+    if (!name || name.length > 200) throw new ValidationError("Channel name must be 1–200 characters");
+    patch.name = name;
+  }
+  if ("description" in raw) {
+    patch.description = str(raw.description).trim();
+    if (patch.description.length > 2000) throw new ValidationError("Description must be 2000 characters or fewer");
+  }
+  if ("categoryId" in raw || "category_id" in raw) patch.categoryId = positiveId(pick(raw, "categoryId", "category_id"));
+  if ("streamUrl" in raw || "stream_url" in raw) patch.streamUrl = streamUrlValue(pick(raw, "streamUrl", "stream_url"));
+  if ("sortOrder" in raw || "sort_order" in raw) patch.sortOrder = orderValue(pick(raw, "sortOrder", "sort_order"), 0);
+  if ("enabled" in raw) patch.enabled = booleanValue(raw.enabled, true);
+  if (!Object.keys(patch).length) throw new ValidationError("No fields to update");
+  return patch;
 }

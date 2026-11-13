@@ -95,7 +95,7 @@ export function titleMetadata(
       title: shareSubject(title),
       description,
       url: landingPath,
-      images: [{ url: image, width: 1200, height: 630, alt: `${title.title} on CINEMAX` }],
+      images: [{ url: image, width: 1200, height: 630, alt: `${title.title} on cinemaxxx` }],
     },
     twitter: {
       card: "summary_large_image",

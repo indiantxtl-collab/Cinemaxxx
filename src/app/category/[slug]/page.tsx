@@ -11,12 +11,16 @@ import EmptyState from "@/components/EmptyState";
 import { PosterGridSkeleton } from "@/components/Skeletons";
 import CinematicButton from "@/components/CinematicButton";
 import PlatformLogo from "@/components/PlatformLogo";
+import ChannelGrid from "@/components/ChannelGrid";
 import { PLATFORM_BY_ID, movieIsOnPlatform, platformIdFromSlug, type PlatformId } from "@/lib/platforms";
 
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = use(params);
   const slug = decodeURIComponent(rawSlug).toLowerCase();
-  const { movies, categories, loading: indexLoading, error: indexError, refresh } = useCatalogue();
+  const { movies, categories, channels, loading: indexLoading, error: indexError, refresh } = useCatalogue();
+  const managed = categories.find((item) => item.slug === slug);
+  const disabled = managed?.enabled === false;
+  const categoryChannels = disabled ? [] : channels.filter((channel) => channel.categoryId === managed?.id);
   const [collection, setCollection] = useState<{ slug: string; movies: CatalogueMovie[]; error: string }>({
     slug: "",
     movies: [],
@@ -26,6 +30,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
 
   useEffect(() => {
     const controller = new AbortController();
+    if (disabled || (indexLoading && categories.length === 0)) return () => controller.abort();
     fetch(`/api/movies?category=${encodeURIComponent(slug)}&limit=500`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Collection unavailable");
@@ -38,7 +43,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           setCollection({ slug, movies: [], error: "This collection could not be loaded. Please try again." });
       });
     return () => controller.abort();
-  }, [slug, retry]);
+  }, [slug, retry, disabled, indexLoading, categories.length]);
 
   const loading = indexLoading && collection.slug !== slug;
   const error = collection.error && indexError ? collection.error : "";
@@ -52,7 +57,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   const name =
     platform?.name ??
     spec?.name ??
-    categories.find((item) => item.slug === slug)?.name ??
+    managed?.name ??
     slug.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 
   // A platform page lists exactly what the home rail counts: titles the library
@@ -65,6 +70,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   );
 
   const titles = useMemo(() => {
+    if (disabled) return [];
     const indexed = movies.filter((movie) => listedInCollection(movie, platformId));
     const apiMatches = (collection.slug === slug ? collection.movies : []).filter((movie) =>
       listedInCollection(movie, platformId)
@@ -75,7 +81,9 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
     if (sort === "rating") selected.sort((a, b) => Number(b.rating ?? 0) - Number(a.rating ?? 0));
     if (sort === "title") selected.sort((a, b) => a.title.localeCompare(b.title));
     return selected;
-  }, [movies, collection, slug, sort, listedInCollection, platformId]);
+  }, [movies, collection, slug, sort, listedInCollection, platformId, disabled]);
+
+  if (disabled) return <main className="secondary-page collection-page" id="main-content" tabIndex={-1}><div className="secondary-page-content"><Link href="/categories" className="page-back"><Icon name="arrow-left" />Explore</Link><EmptyState title="Category unavailable" description="This category is currently disabled." icon="explore" /></div></main>;
 
   const cover = titles.find((movie) => movie.backdropUrl)?.backdropUrl || titles[0]?.posterUrl;
 
@@ -100,9 +108,10 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             )}
           </div>
         </div>
+        {!disabled && <ChannelGrid channels={categoryChannels} />}
         <div className="collection-toolbar">
           <span className="result-count" role="status">
-            {loading ? "Loading titles…" : `${titles.length} ${titles.length === 1 ? "title" : "titles"}`}
+            {loading ? "Loading titles…" : `${titles.length + categoryChannels.length} ${titles.length + categoryChannels.length === 1 ? "title" : "titles"}`}
           </span>
           <label className="sort-field">
             <Icon name="sort" />
@@ -134,7 +143,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
               <MovieCard key={movie.id} movie={movie} />
             ))}
           </div>
-        ) : (
+        ) : categoryChannels.length ? null : (
           <EmptyState
             title="No titles here yet"
             description="Choose another collection to keep exploring."

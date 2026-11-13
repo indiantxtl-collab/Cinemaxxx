@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, timestamp, boolean, varchar } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, timestamp, boolean, varchar, customType } from "drizzle-orm/pg-core";
 
 export const movies = pgTable("movies", {
   id: serial("id").primaryKey(),
@@ -47,6 +47,8 @@ export const categories = pgTable("categories", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull(),
   slug: varchar("slug", { length: 100 }).notNull().unique(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  enabled: boolean("enabled").notNull().default(true),
 });
 
 export const watchlist = pgTable("watchlist", {
@@ -60,4 +62,27 @@ export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 200 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+});
+
+export const channels = pgTable("channels", {
+  id: serial("id").primaryKey(),
+  categoryId: integer("category_id").notNull().references(() => categories.id, { onDelete: "restrict" }),
+  name: varchar("name", { length: 200 }).notNull(),
+  description: text("description").notNull().default(""),
+  streamUrl: text("stream_url").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  enabled: boolean("enabled").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({ dataType: () => "bytea" });
+
+export const channelLogos = pgTable("channel_logos", {
+  channelId: integer("channel_id").primaryKey().references(() => channels.id, { onDelete: "cascade" }),
+  content: bytea("content").notNull(),
+  mimeType: varchar("mime_type", { length: 32 }).notNull(),
+  byteSize: integer("byte_size").notNull(),
+  sha256: varchar("sha256", { length: 64 }).notNull(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

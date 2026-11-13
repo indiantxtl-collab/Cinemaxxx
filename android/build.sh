@@ -3,7 +3,7 @@
 # Cinemax · Android APK build
 #
 # Gradle-free, SDK-manager-free build of the Cinemax Android app. The app is a
-# native shell around the production deployment (https://cinemax-orpin.vercel.app)
+# native shell around the production deployment (the origin configured by CINEMAXXX_SITE_URL)
 # plus an app-only presentation layer; the Next.js app, its API routes, the
 # PostgreSQL database, the studio/admin panel and authentication are unchanged
 # and are not part of this build.
@@ -12,8 +12,8 @@
 #   bash android/build.sh --debug      # debuggable build + sign + verify
 #   bash android/build.sh --no-verify  # skip the post-build verification
 #
-# Output: android/dist/Cinemax-<version>.apk               (release)
-#         android/dist/Cinemax-<version>-debug.apk         (--debug)
+# Output: android/dist/cinemaxxx-<version>.apk               (release)
+#         android/dist/cinemaxxx-<version>-debug.apk         (--debug)
 #
 # Both variants keep the same application id, version, permissions, launcher
 # activity and deep-link host. --debug differs in exactly two ways: the manifest
@@ -21,8 +21,8 @@
 # signed with a separate local debug key.
 #
 # Tool overrides (optional):
-#   CINEMAX_JAVA CINEMAX_KEYTOOL CINEMAX_AAPT2 CINEMAX_ANDROID_JAR
-#   CINEMAX_D8_JAR CINEMAX_ECJ_JAR CINEMAX_APKSIGNER_JAR CINEMAX_HTTP_TIMEOUT
+#   CINEMAXXX_JAVA CINEMAXXX_KEYTOOL CINEMAXXX_AAPT2 CINEMAXXX_ANDROID_JAR
+#   CINEMAXXX_D8_JAR CINEMAXXX_ECJ_JAR CINEMAXXX_APKSIGNER_JAR CINEMAXXX_HTTP_TIMEOUT
 # =============================================================================
 set -euo pipefail
 export PYTHONDONTWRITEBYTECODE=1
@@ -32,14 +32,14 @@ PROJECT="$SCRIPT_DIR"
 MAIN="$PROJECT/app/src/main"
 BUILD="$PROJECT/build"
 DIST="$PROJECT/dist"
-CACHE="${CINEMAX_TOOLCHAIN:-$PROJECT/.toolchain}"
+CACHE="${CINEMAXXX_TOOLCHAIN:-$PROJECT/.toolchain}"
 KEYSTORE_DIR="$PROJECT/keystore"
-KEYSTORE="${CINEMAX_KEYSTORE:-$KEYSTORE_DIR/cinemax-release.keystore}"
-KEY_ALIAS="${CINEMAX_KEY_ALIAS:-cinemax}"
-KEY_PASS="${CINEMAX_KEY_PASS:-cinemax-release}"
-STORE_PASS="${CINEMAX_STORE_PASS:-$KEY_PASS}"
+KEYSTORE="${CINEMAXXX_KEYSTORE:-}"
+KEY_ALIAS="${CINEMAXXX_KEY_ALIAS:-}"
+KEY_PASS="${CINEMAXXX_KEY_PASS:-}"
+STORE_PASS="${CINEMAXXX_STORE_PASS:-}"
 
-APP_NAME="Cinemax"
+APP_NAME="cinemaxxx"
 VERSION_NAME="1.1.0"
 MIN_SDK="24"
 TARGET_SDK="34"
@@ -54,10 +54,17 @@ for argument in "$@"; do
   esac
 done
 
+if [ "$DEBUG" != "1" ]; then
+  for name in CINEMAXXX_KEYSTORE CINEMAXXX_KEY_ALIAS CINEMAXXX_KEY_PASS CINEMAXXX_STORE_PASS; do
+    [ -n "${!name:-}" ] || { printf "Release builds require %s; no release key or password is bundled. See android/README.md.\n" "$name" >&2; exit 1; }
+  done
+  [ -f "$KEYSTORE" ] || { printf "Release keystore not found: %s\n" "$KEYSTORE" >&2; exit 1; }
+fi
+
 if [ "$DEBUG" = "1" ]; then
   # A debug build must not be mistaken for the release artifact, so it signs with
   # its own key and says so in its file name.
-  KEYSTORE="${CINEMAX_DEBUG_KEYSTORE:-$KEYSTORE_DIR/cinemax-debug.keystore}"
+  KEYSTORE="${CINEMAXXX_DEBUG_KEYSTORE:-$KEYSTORE_DIR/cinemax-debug.keystore}"
   KEY_ALIAS="cinemax-debug"
   KEY_PASS="cinemax-debug"
   STORE_PASS="cinemax-debug"
@@ -73,15 +80,15 @@ if [ ! -f "$CACHE/.fetched" ]; then
   bash "$PROJECT/tools/fetch-toolchain.sh"
 fi
 
-JAVA="${CINEMAX_JAVA:-$CACHE/jdk/bin/java}"
-KEYTOOL="${CINEMAX_KEYTOOL:-$CACHE/jdk/bin/keytool}"
-AAPT2="${CINEMAX_AAPT2:-$CACHE/bin/aapt2}"
-ANDROID_JAR="${CINEMAX_ANDROID_JAR:-$CACHE/lib/android.jar}"
-D8_JAR="${CINEMAX_D8_JAR:-$CACHE/lib/d8.jar}"
-ECJ_JAR="${CINEMAX_ECJ_JAR:-$CACHE/lib/ecj.jar}"
-APKSIGNER_JAR="${CINEMAX_APKSIGNER_JAR:-$CACHE/lib/apksigner.jar}"
+JAVA="${CINEMAXXX_JAVA:-$CACHE/jdk/bin/java}"
+KEYTOOL="${CINEMAXXX_KEYTOOL:-$CACHE/jdk/bin/keytool}"
+AAPT2="${CINEMAXXX_AAPT2:-$CACHE/bin/aapt2}"
+ANDROID_JAR="${CINEMAXXX_ANDROID_JAR:-$CACHE/lib/android.jar}"
+D8_JAR="${CINEMAXXX_D8_JAR:-$CACHE/lib/d8.jar}"
+ECJ_JAR="${CINEMAXXX_ECJ_JAR:-$CACHE/lib/ecj.jar}"
+APKSIGNER_JAR="${CINEMAXXX_APKSIGNER_JAR:-$CACHE/lib/apksigner.jar}"
 
-[ -x "$JAVA" ] || fail "java not found at $JAVA (run android/tools/fetch-toolchain.sh or set CINEMAX_JAVA)"
+[ -x "$JAVA" ] || fail "java not found at $JAVA (run android/tools/fetch-toolchain.sh or set CINEMAXXX_JAVA)"
 [ -x "$AAPT2" ] || fail "aapt2 not found at $AAPT2"
 [ -f "$ANDROID_JAR" ] || fail "android.jar not found at $ANDROID_JAR"
 [ -f "$D8_JAR" ] || fail "d8.jar not found at $D8_JAR"
@@ -98,6 +105,10 @@ step "Preparing the build tree"
 rm -rf "$BUILD"
 mkdir -p "$BUILD/classes" "$BUILD/dex" "$BUILD/gen" "$BUILD/assets" "$BUILD/res" "$DIST"
 
+# ------------------------------------------- independent deployment origin
+step "Configuring this fork's deployment origin"
+python3 "$PROJECT/tools/configure-deployment.py" "$BUILD"
+
 # ---------------------------------------------------- resources (aapt2)
 step "Compiling resources and linking the Android manifest"
 # aapt2's --debug-mode is what sets android:debuggable="true" in the linked manifest.
@@ -109,7 +120,7 @@ AAPT2_DEBUG_ARGS=()
 "$AAPT2" link \
   -o "$BUILD/resources.apk" \
   -I "$ANDROID_JAR" \
-  --manifest "$MAIN/AndroidManifest.xml" \
+  --manifest "$BUILD/AndroidManifest.xml" \
   --java "$BUILD/gen" \
   --min-sdk-version "$MIN_SDK" \
   --target-sdk-version "$TARGET_SDK" \
@@ -167,7 +178,7 @@ python3 "$PROJECT/tools/align_apk.py" "$BUILD/app-unsigned.apk" "$BUILD/app-alig
 step "Signing"
 mkdir -p "$KEYSTORE_DIR"
 if [ ! -f "$KEYSTORE" ]; then
-  info "creating a release keystore at $KEYSTORE"
+  info "creating a local debug keystore at $KEYSTORE"
   "$KEYTOOL" -genkeypair \
     -keystore "$KEYSTORE" \
     -alias "$KEY_ALIAS" \
@@ -175,7 +186,7 @@ if [ ! -f "$KEYSTORE" ]; then
     -validity 10950 \
     -storetype PKCS12 \
     -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-    -dname "CN=Cinemax, OU=Cinemax App, O=Cinemax, L=Internet, C=IN" >/dev/null
+    -dname "CN=cinemaxxx, OU=cinemaxxx App, O=cinemaxxx, L=Internet, C=IN" >/dev/null
 else
   info "using existing keystore $KEYSTORE"
 fi
@@ -191,6 +202,7 @@ rm -f "$APK_OUT"
   --ks-key-alias "$KEY_ALIAS" \
   --ks-pass "pass:$STORE_PASS" \
   --key-pass "pass:$KEY_PASS" \
+  --min-sdk-version "$MIN_SDK" \
   --v1-signing-enabled true \
   --v2-signing-enabled true \
   --v3-signing-enabled true \

@@ -8,13 +8,13 @@
  */
 
 /** Identity of the shipped build. Asserted against the APK itself. */
-export const APP_PACKAGE = "com.cinemax.app";
+export const APP_PACKAGE = "com.cinemaxxx.app";
 export const APP_VERSION = "1.1.0";
 export const APP_VERSION_CODE = 2;
 
 /** The verified artifact every download uses. No third-party host, no redirect. */
 export const APP_DOWNLOAD_PATH = "/download/android";
-export const APP_APK_FILE = "Cinemax-1.1.0.apk";
+export const APP_APK_FILE = "cinemaxxx-1.1.0.apk";
 
 /** Remembered for half a year, on the device only. */
 export const APP_PROMO_STORAGE_KEY = "cinemax:app-promo:v1";
@@ -50,8 +50,8 @@ export function isAndroidUserAgent(userAgent: string): boolean {
 
 export function availabilityMessage(isAndroid: boolean): string {
   return isAndroid
-    ? `CINEMAX for Android · version ${APP_VERSION} · signed release build`
-    : `The CINEMAX app is for Android. Open cinemaxtv.space on an Android phone to install it — this device can keep using the website.`;
+    ? `cinemaxxx for Android · version ${APP_VERSION} · verification build; configure your deployment before publishing`
+    : `The cinemaxxx app is for Android. Open this website on an Android phone to install it — this device can keep using the website.`;
 }
 
 /** The download URL, always on the official origin and never a redirect page. */

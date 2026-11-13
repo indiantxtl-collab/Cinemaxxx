@@ -30,7 +30,7 @@ export const directMediaAdapter: ProviderAdapter = {
   info: {
     id: "direct-media",
     name: "Video file",
-    tagline: "Direct MP4, WebM, HLS and DASH sources play in the Cinemax player.",
+    tagline: "Direct MP4, WebM, HLS and DASH sources play in the cinemaxxx player.",
     accent: "#4fd8ff",
     requirements: { login: false, subscription: false, drm: false },
   },

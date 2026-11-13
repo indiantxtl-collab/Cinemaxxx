@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-export const metadata: Metadata = { title: "Cinemax studio" };
+export const metadata: Metadata = { title: "cinemaxxx studio" };
 export default function Layout({ children }: { children: ReactNode }) { return children; }

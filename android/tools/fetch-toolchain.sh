@@ -20,7 +20,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ANDROID_DIR="$(dirname "$SCRIPT_DIR")"
-CACHE="${CINEMAX_TOOLCHAIN:-$ANDROID_DIR/.toolchain}"
+CACHE="${CINEMAXXX_TOOLCHAIN:-$ANDROID_DIR/.toolchain}"
 
 MINAPK_VERSION="0.4.0"
 MINAPK_SHA256="d22fccaba9a909cf02f196c91ca1e45ac9cb4b32c6e16cf0493182d26c071417"
@@ -42,7 +42,7 @@ verify_sha256() {
 
 case "$(uname -s)" in
   Linux) ;;
-  *) fail "This fetcher targets Linux. On macOS/Windows, install the same tools manually and pass CINEMAX_JAVA / CINEMAX_AAPT2 / CINEMAX_ANDROID_JAR / CINEMAX_D8_JAR / CINEMAX_ECJ_JAR / CINEMAX_APKSIGNER_JAR to android/build.sh." ;;
+  *) fail "This fetcher targets Linux. On macOS/Windows, install the same tools manually and pass CINEMAXXX_JAVA / CINEMAXXX_AAPT2 / CINEMAXXX_ANDROID_JAR / CINEMAXXX_D8_JAR / CINEMAXXX_ECJ_JAR / CINEMAXXX_APKSIGNER_JAR to android/build.sh." ;;
 esac
 
 # Preflight: the fetcher and the build itself need these, and a clear message
@@ -117,10 +117,10 @@ fi
 
 # ---------------------------------------------------------------- PyPI: jdk4py
 if [ ! -x "$CACHE/jdk/bin/java" ]; then
-  if [ -n "${CINEMAX_JAVA:-}" ] && [ -x "${CINEMAX_JAVA:-}" ]; then
-    log "using CINEMAX_JAVA=$CINEMAX_JAVA instead of downloading a JRE"
+  if [ -n "${CINEMAXXX_JAVA:-}" ] && [ -x "${CINEMAXXX_JAVA:-}" ]; then
+    log "using CINEMAXXX_JAVA=$CINEMAXXX_JAVA instead of downloading a JRE"
     mkdir -p "$CACHE/jdk/bin" "$CACHE/jdk/lib"
-    ln -sf "$CINEMAX_JAVA" "$CACHE/jdk/bin/java"
+    ln -sf "$CINEMAXXX_JAVA" "$CACHE/jdk/bin/java"
     if command -v keytool >/dev/null 2>&1; then
       ln -sf "$(command -v keytool)" "$CACHE/jdk/bin/keytool"
     fi

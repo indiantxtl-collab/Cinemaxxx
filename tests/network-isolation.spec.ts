@@ -84,7 +84,7 @@ const videoState = (page: Page) => page.evaluate(() => {
 test.describe("external media network isolation", () => {
   test.beforeEach(async ({ page }) => { await preparePage(page); });
 
-  test("media requests go straight to the provider with the stored URL; nothing is proxied through Cinemax", async ({ page, request }) => {
+  test("media requests go straight to the provider with the stored URL; nothing is proxied through cinemaxxx", async ({ page, request }) => {
     const provider = control();
     await serveProvider(page, provider);
     const movie = await createPlaybackMovie(request, CLIP);

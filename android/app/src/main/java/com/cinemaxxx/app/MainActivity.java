@@ -1,4 +1,4 @@
-package com.cinemax.app;
+package com.cinemaxxx.app;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -39,7 +39,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
     /** The one and only content origin. Never localhost, never a dev server. */
-    public static final String HOME_URL = "https://" + NavigationPolicy.PRODUCTION_HOST + "/";
+    public static final String HOME_URL = Deployment.HOME_URL;
     public static final String PRODUCTION_HOST = NavigationPolicy.PRODUCTION_HOST;
 
     private static final String JS_BRIDGE_NAME = "CinemaxNative";
@@ -988,6 +988,14 @@ public class MainActivity extends Activity {
 
     public boolean isFullscreen() {
         return customView != null || pagePlayerFullscreen;
+    }
+
+    /** Called by the first-entry screen when the visitor selects No. */
+    public void exitApplication() {
+        if (web != null) {
+            web.stopLoading();
+        }
+        finishAndRemoveTask();
     }
 
     /** A video fullscreen button always opens a landscape cinema surface. */

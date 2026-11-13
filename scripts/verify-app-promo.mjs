@@ -49,7 +49,7 @@ const read = (relative) => readFileSync(join(root, relative), "utf8");
 
 section("The downloaded artifact is the app");
 {
-  const apk = join(root, "public", "downloads", "Cinemax-1.1.0.apk");
+  const apk = join(root, "public", "downloads", "cinemaxxx-1.1.0.apk");
   const reported = JSON.parse(
     execFileSync("python3", [join(root, "android", "tests", "apk_summary.py"), apk], { encoding: "utf8" })
   );
@@ -58,7 +58,7 @@ section("The downloaded artifact is the app");
   check(reported.intact, "the archive is intact (every entry unpacks)");
   check(reported.manifest, "it declares an Android manifest");
   check(reported.dex?.length >= 1, "it contains compiled code", (reported.dex ?? []).join(", "));
-  check(reported.package === "com.cinemax.app", "package id is com.cinemax.app", reported.package);
+  check(reported.package === "com.cinemaxxx.app", "package id is com.cinemaxxx.app", reported.package);
   check(reported.versionName === "1.1.0", "version name is 1.1.0", reported.versionName);
   check(reported.versionCode === "2", "version code is 2", reported.versionCode);
   check(
@@ -128,7 +128,7 @@ section("First visit only, device-side, never blocking");
   check(!/vercel/i.test(api.availabilityMessage(false)), "the availability message names no deployment host");
 
   check(api.appDownloadUrl() === "/download/android", "the download URL is the route on this origin", api.appDownloadUrl());
-  check(api.appDownloadUrl("https://cinemaxtv.space") === "https://cinemaxtv.space/download/android", "the absolute form stays on the official domain");
+  check(api.appDownloadUrl("https://example.invalid") === "https://example.invalid/download/android", "the absolute form stays on the supplied deployment origin");
 
   // Dismissal: storage first, cookie as the durable record, both device-side.
   const store = new Map();

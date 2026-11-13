@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { hasNativeShell } from "@/lib/open-external";
+import { useAgeDeclared } from "./AgeDeclarationContext";
 import {
   APP_DOWNLOAD_PATH,
   APP_PROMO_DELAY_MS,
@@ -35,6 +36,7 @@ import {
  * element, and it is skipped entirely under `prefers-reduced-motion`.
  */
 export default function AppPromo() {
+  const ageDeclared = useAgeDeclared();
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [isAndroid, setIsAndroid] = useState(true);
@@ -42,6 +44,7 @@ export default function AppPromo() {
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!ageDeclared) return;
     const storage = (() => {
       try {
         return window.localStorage;
@@ -69,7 +72,7 @@ export default function AppPromo() {
     return () => {
       if (timer.current) window.clearTimeout(timer.current);
     };
-  }, []);
+  }, [ageDeclared]);
 
   const close = useCallback(() => {
     setVisible(false);
@@ -98,12 +101,12 @@ export default function AppPromo() {
   if (!visible || dismissed) return null;
 
   return (
-    <aside className="app-promo" role="complementary" aria-label="Get the CINEMAX Android app">
+    <aside className="app-promo" role="complementary" aria-label="Get the cinemaxxx Android app">
       <div className="app-promo-glow" aria-hidden="true" />
       <div className="app-promo-body">
         <p className="app-promo-eyebrow">
           <span className="app-promo-dot" aria-hidden="true" />
-          CINEMAX for Android · v{APP_VERSION}
+          cinemaxxx for Android · v{APP_VERSION}
         </p>
         <h2 className="app-promo-title">Get this app &amp; enjoy it</h2>
         <p className="app-promo-copy">
@@ -119,7 +122,7 @@ export default function AppPromo() {
               download
               // A real file response; no redirect, no page in between.
               rel="nofollow"
-              onClick={() => setNote(`Downloading CINEMAX ${APP_VERSION}…`)}
+              onClick={() => setNote(`Downloading cinemaxxx ${APP_VERSION}…`)}
             >
               <span className="app-promo-download-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

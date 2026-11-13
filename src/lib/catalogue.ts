@@ -35,6 +35,21 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
+  sortOrder: number;
+  enabled: boolean;
+}
+
+export interface Channel {
+  id: number;
+  categoryId: number;
+  categoryName: string;
+  categorySlug: string;
+  name: string;
+  description: string;
+  streamUrl: string;
+  logoUrl: string | null;
+  sortOrder: number;
+  enabled: boolean;
 }
 
 export interface FeaturedSlide {

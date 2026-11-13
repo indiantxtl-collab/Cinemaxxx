@@ -45,7 +45,7 @@ const dnsCache = new Map<string, { address: string; family: number; at: number }
 const dnsInFlight = new Map<string, Promise<{ address: string; family: number }>>();
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
 const USER_AGENT =
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 CinemaxPlayback/1.0";
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 CinemaxxxPlayback/1.0";
 
 const PRIVATE_ADDRESSES = new BlockList();
 ([

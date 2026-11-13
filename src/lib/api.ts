@@ -4,8 +4,9 @@ import { verifyToken } from "@/lib/auth";
 /** Parse a route/query id. Returns null when it is not a positive integer. */
 export function parseId(rawId: string | null | undefined): number | null {
   if (!rawId) return null;
-  const id = Number.parseInt(rawId, 10);
-  return Number.isFinite(id) && id > 0 ? id : null;
+  if (!/^\d+$/.test(rawId)) return null;
+  const id = Number(rawId);
+  return Number.isSafeInteger(id) && id > 0 && id <= 2147483647 ? id : null;
 }
 
 /** True when the request carries a valid admin session cookie. */

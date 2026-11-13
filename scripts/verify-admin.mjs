@@ -1,7 +1,7 @@
 /**
  * End-to-end check of the admin API against a running server.
  *
- *   ADMIN_EMAIL=admin@cinemax.com ADMIN_PASSWORD=... npm run verify:api
+ *   ADMIN_EMAIL=<your-configured-email> ADMIN_PASSWORD=<your-configured-password> npm run verify:api
  *   BASE_URL=https://your-app.vercel.app npm run verify:api
  *
  * It creates its own rows, exercises every CRUD path, and removes what it
@@ -9,9 +9,10 @@
  */
 
 const BASE = process.env.BASE_URL || "http://localhost:3000";
-const EMAIL = process.env.ADMIN_EMAIL || "admin@cinemax.com";
-const PASSWORD = process.env.ADMIN_PASSWORD || "Admin@123";
+const EMAIL = process.env.ADMIN_EMAIL;
+const PASSWORD = process.env.ADMIN_PASSWORD;
 const MARKER = `verify-${Date.now()}`;
+if (!EMAIL || !PASSWORD) throw new Error("ADMIN_EMAIL and ADMIN_PASSWORD must be set for the test server; no default credentials are supplied.");
 
 let cookie = "";
 let passed = 0;
@@ -85,7 +86,7 @@ const movie = {
 };
 
 async function main() {
-  console.log(`\nCineMax admin API verification → ${BASE}\n`);
+  console.log(`\ncinemaxxx admin API verification → ${BASE}\n`);
 
   console.log("health & connection");
   const health = await call("GET", "/api/health", undefined, { cookie: false });

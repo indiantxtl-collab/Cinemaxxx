@@ -24,7 +24,12 @@ export async function GET() {
     );
   }
 
-  const schema = await ensureSchema();
+  let schema;
+  try {
+    schema = await ensureSchema();
+  } catch (error) {
+    return Response.json({ ok: false, stage: "schema", error: message(error), connection }, { status: 500 });
+  }
   if (!schema.ok) {
     return Response.json(
       { ok: false, stage: "schema", error: schema.error, connection, tables: schema.tables },
@@ -36,7 +41,8 @@ export async function GET() {
     const { rows } = await getPool().query<{ count: number }>(
       `select (select count(*) from movies)::int as movies,
               (select count(*) from slides)::int as slides,
-              (select count(*) from categories)::int as categories`
+              (select count(*) from categories)::int as categories,
+              (select count(*) from channels)::int as channels`
     );
     return Response.json({ ok: true, connection, tables: schema.tables, counts: rows[0] });
   } catch (error) {

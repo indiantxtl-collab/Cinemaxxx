@@ -282,7 +282,7 @@ export default function PlaybackOverlay({ movie, onClose, openImmersive = true, 
       <div className="video-player-shell" role="dialog" aria-modal="true" aria-label={`Preparing ${movie.title}`}>
         <div className="player-error">
           <h2 className="player-error-title">Finding the stream…</h2>
-          <p className="player-error-copy">Cinemax is checking this title’s link for a video or the provider’s own player.</p>
+          <p className="player-error-copy">cinemaxxx is checking this title’s link for a video or the provider’s own player.</p>
           <div className="player-error-actions">
             <button type="button" onClick={requestClose}>Cancel</button>
           </div>

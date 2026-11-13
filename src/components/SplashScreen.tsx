@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Logo, { CinemaxEmblem } from "./Logo";
 import Icon from "./Icon";
 import useReducedMotion from "@/hooks/useReducedMotion";
+import { useAgeDeclared } from "./AgeDeclarationContext";
 
 const SESSION_KEY = "cinemax:prism-intro:v1";
 const EVENT = "cinemax:intro-phase";
@@ -30,10 +31,11 @@ function setPhase(phase: Phase) {
 
 export default function SplashScreen() {
   const pathname = usePathname();
+  const ageDeclared = useAgeDeclared();
   const phase = useSyncExternalStore(subscribe, getSnapshot, (): Phase => "open");
   const reducedMotion = useReducedMotion();
   const dialog = useRef<HTMLDivElement>(null);
-  const visible = pathname === "/" && phase !== "done";
+  const visible = ageDeclared && pathname === "/" && phase !== "done";
 
   useEffect(() => {
     if (!visible) return;
@@ -62,7 +64,7 @@ export default function SplashScreen() {
   }, [phase, reducedMotion, visible]);
 
   if (!visible) return null;
-  return <div ref={dialog} className={`splash-screen ${phase === "closing" ? "is-closing" : ""}`} role="dialog" aria-modal="true" aria-label="Opening Cinemax" tabIndex={-1}>
+  return <div ref={dialog} className={`splash-screen ${phase === "closing" ? "is-closing" : ""}`} role="dialog" aria-modal="true" aria-label="Opening cinemaxxx" tabIndex={-1}>
     <div className="splash-atmosphere" aria-hidden="true" />
     <div className="splash-ring splash-ring-one" aria-hidden="true" />
     <div className="splash-ring splash-ring-two" aria-hidden="true" />

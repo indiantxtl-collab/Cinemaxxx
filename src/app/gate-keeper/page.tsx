@@ -33,14 +33,14 @@ export default function AdminLoginPage() {
   };
 
   return <main className="studio-login" id="main-content" tabIndex={-1}><div className="studio-login-card">
-    <Link href="/" aria-label="Cinemax home"><Logo /></Link>
-    <h1>Cinemax studio</h1><p>Sign in to manage your library.</p>
+    <Link href="/" aria-label="cinemaxxx home"><Logo /></Link>
+    <h1>cinemaxxx studio</h1><p>Sign in to manage your library.</p>
     <form onSubmit={handleLogin}>
       <div><label htmlFor="studio-email">Email</label><input id="studio-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="glass-input" placeholder="admin@example.com" autoComplete="username" required /></div>
       <div><label htmlFor="studio-password">Password</label><input id="studio-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="glass-input" placeholder="Your password" autoComplete="current-password" required /></div>
       {error && <div className="studio-login-error" role="alert">{error}</div>}
       <CinematicButton type="submit" disabled={loading} icon={<Icon name="lock" />}>{loading ? "Signing in…" : "Sign in"}</CinematicButton>
     </form>
-    <Link href="/" className="page-back"><Icon name="arrow-left" />Back to Cinemax</Link>
+    <Link href="/" className="page-back"><Icon name="arrow-left" />Back to cinemaxxx</Link>
   </div></main>;
 }

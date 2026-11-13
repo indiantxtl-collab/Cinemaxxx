@@ -119,7 +119,8 @@ function NavGlowArc() {
 
 export default function BottomNav() {
   const pathname = usePathname() || "/";
-  const { movies, categories } = useCatalogue();
+  const { movies, categories, channels } = useCatalogue();
+  const enabledCategories = categories.filter((category) => category.enabled);
   const [browserOpen, setBrowserOpen] = useState(false);
   const savedScrollYRef = useRef<number>(0);
   const historyPushedRef = useRef<boolean>(false);
@@ -219,10 +220,12 @@ export default function BottomNav() {
     if (!browserOpen) return meta;
     const slugs = new Set<string>();
     for (const section of CATEGORY_BROWSER_SECTIONS) for (const item of section.items) slugs.add(item.slug);
-    for (const category of categories) slugs.add(category.slug);
+    for (const category of enabledCategories) slugs.add(category.slug);
     for (const slug of slugs) {
-      let count = 0;
-      let image: string | null = null;
+      const managed = enabledCategories.find((category) => category.slug === slug);
+      const categoryChannels = managed ? channels.filter((channel) => channel.categoryId === managed.id) : [];
+      let count = categoryChannels.length;
+      let image: string | null = categoryChannels.find((channel) => channel.logoUrl)?.logoUrl ?? null;
       for (const movie of movies) {
         if (!matchesCollection(movie, slug)) continue;
         count += 1;
@@ -231,7 +234,9 @@ export default function BottomNav() {
       meta.set(slug, { count, image });
     }
     return meta;
-  }, [browserOpen, movies, categories]);
+  }, [browserOpen, movies, enabledCategories, channels]);
+
+  const managedSlugs = useMemo(() => new Set(categories.map((category) => category.slug)), [categories]);
 
   const categoryCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -248,23 +253,24 @@ export default function BottomNav() {
     const sections = CATEGORY_BROWSER_SECTIONS.map((section) => ({
       ...section,
       items: section.items.filter((item) => {
-        if ((categoryCounts.get(item.slug) ?? 0) > 0 || categories.some((c) => c.slug === item.slug)) {
+        if (managedSlugs.has(item.slug)) return false;
+        if ((categoryCounts.get(item.slug) ?? 0) > 0) {
           knownSlugs.add(item.slug);
           return true;
         }
         return false;
       }),
     })).filter((section) => section.items.length > 0);
-    const extra = categories
+    const extra = enabledCategories
       .filter((category) => !knownSlugs.has(category.slug))
       .map((category) => ({ slug: category.slug, label: category.name, href: `/category/${category.slug}` }));
-    if (extra.length) sections.push({ id: "your-categories", title: "Your Categories", items: extra });
+    if (extra.length) sections.unshift({ id: "your-categories", title: "Your Categories", items: extra });
     return sections;
-  }, [categories, categoryCounts]);
-
-  if (HIDDEN_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return null;
+  }, [enabledCategories, categoryCounts, managedSlugs]);
 
   const activeIndex = browserOpen ? 2 : activeBottomNavIndex(pathname);
+
+  if (HIDDEN_PREFIXES.some((prefix) => pathname.startsWith(prefix))) return null;
 
   return (
     <>
@@ -283,7 +289,7 @@ export default function BottomNav() {
             </div>
             <div className="category-browser-header">
               <div>
-                <p className="category-browser-eyebrow">Cinemax Catalog</p>
+                <p className="category-browser-eyebrow">cinemaxxx Catalog</p>
                 <h2 className="category-browser-title">More</h2>
               </div>
               <button

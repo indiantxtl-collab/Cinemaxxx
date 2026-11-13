@@ -99,8 +99,8 @@ test("Coming Soon collection separates upcoming movies with Coming Soon badge, r
 test("admin source verification service validates real streams and rejects dead URLs", async ({ request }) => {
   const login = await request.post("/api/admin/login", {
     data: {
-      email: process.env.ADMIN_EMAIL || "admin@cinemax.com",
-      password: process.env.ADMIN_PASSWORD || "Admin@123",
+      email: process.env.ADMIN_EMAIL,
+      password: process.env.ADMIN_PASSWORD,
     },
   });
   expect(login.ok()).toBeTruthy();
