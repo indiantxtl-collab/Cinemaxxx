@@ -165,7 +165,7 @@ const fixture = `<!DOCTYPE html>
 const dom = new JSDOM(fixture, {
   runScripts: "outside-only",
   pretendToBeVisual: true,
-  url: "https://cinemax-orpin.vercel.app/",
+  url: "https://cinemaxxx.cinemaxtv.space/",
 });
 
 const { window } = dom;
@@ -176,7 +176,7 @@ const bridgeCalls = [];
 window.CinemaxNative = {
   platform: () => "android-34",
   appVersion: () => "1.1.0",
-  homeUrl: () => "https://cinemax-orpin.vercel.app/",
+  homeUrl: () => "https://cinemaxxx.cinemaxtv.space/",
   themeApplied: () => bridgeCalls.push("themeApplied"),
   shellReady: () => bridgeCalls.push("shellReady"),
   setMediaPlaying: (playing) => bridgeCalls.push(`media:${playing}`),
@@ -506,7 +506,7 @@ console.log("\n== scroll engine (one passive listener, idle decode ahead of the 
 const scrollDom = new JSDOM(fixture, {
   runScripts: "outside-only",
   pretendToBeVisual: true,
-  url: "https://cinemax-orpin.vercel.app/",
+  url: "https://cinemaxxx.cinemaxtv.space/",
 });
 const sw = scrollDom.window;
 const sd = sw.document;
@@ -607,7 +607,7 @@ if (hostilePath) {
   const hostileDom = new JSDOM(fixture, {
     runScripts: "outside-only",
     pretendToBeVisual: true,
-    url: "https://cinemax-orpin.vercel.app/",
+    url: "https://cinemaxxx.cinemaxtv.space/",
     // The hostile payload is *meant* to be rejected by the CSS parser, so the
     // expected "Could not parse CSS stylesheet" report is silenced: it is not a
     // failure, and its stack trace only makes the log look broken.

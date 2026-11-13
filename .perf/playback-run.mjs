@@ -35,7 +35,7 @@ await build({
   absWorkingDir: root,
 });
 
-const dom = new JSDOM("<!doctype html><html><body></body></html>", { url: "https://www.cinemaxtv.space/", pretendToBeVisual: true });
+const dom = new JSDOM("<!doctype html><html><body></body></html>", { url: "https://cinemaxxx.cinemaxtv.space/", pretendToBeVisual: true });
 
 dom.window.matchMedia = (query) => ({
   matches: false, media: query, onchange: null,

@@ -126,7 +126,7 @@ studio's platform picker, and its own `platform-cinemax` token in the existing
 
 It is deliberately **not** the application's logo. This project's own identity -
 the `<CinemaxEmblem>` lockup in `src/components/Logo.tsx`,
-`public/brand/cinemax-symbol.svg`, `public/brand/cinemax-app-icon.svg`, the
+`public/brand/cinemaxxx-logo.png`, `public/icon-512.png`, the
 native splash emblem and the favicon - is untouched and is never shipped as a
 platform logo. `scripts/verify-platform-logos.mjs` asserts both halves: the
 application files are still present, and the platform artwork is not a copy of
@@ -185,7 +185,7 @@ Neutrals: `--bg #040406`, `--surface #0a0a0e`, `--accent-blue #cfd0da`,
 ### Protected brand treatments (deliberately untouched)
 
 * the CINEMAX emblem/wordmark and its blue-purple-pink gradient
-  (`CinemaxEmblem`, `.logo-wordmark`, `/brand/cinemax-symbol.svg`);
+  (`CinemaxEmblem`, `/brand/cinemaxxx-logo-256.png`);
 * the primary Play/Explore button family — `.cinematic-button` keeps its brand
   gradient, and `Icon name="play"` is unchanged;
 * the intentional pink accent (`--accent-pink #ef76cb`, `#ff4fa3` in the More

@@ -310,7 +310,7 @@ section("Official domain");
   // Even when the page itself is served from a deployment hostname, the link a
   // share carries is the official one.
   const preview = load();
-  preview.windowObject.location.origin = "https://cinemax-orpin.vercel.app";
+  preview.windowObject.location.origin = "https://cinemaxxx-preview.vercel.app";
   const previewPayload = preview.api.buildSharePayload(movie);
   check(
     previewPayload.url === `${ORIGIN}/share/42`,

@@ -142,7 +142,7 @@ function BrandCard({ notice, isOwnBrand }: { notice: PlatformBrandNotice; isOwnB
               without dangerouslyAllowSVG, so the plain element is correct. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={platform?.logo ?? "/brand/cinemax-symbol.svg"}
+            src={platform?.logo ?? "/brand/cinemaxxx-logo-256.png"}
             alt={`${notice.service} logo`}
             loading="lazy"
             decoding="async"

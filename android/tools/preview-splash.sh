@@ -6,7 +6,7 @@
 #
 # Renders the native splash without a device: the timeline, the curves and the
 # viewport geometry come from the app's own SplashMotion class and the logo is
-# rasterised from the packaged drawable path data (SplashPreview.java mirrors
+# taken from the packaged PNG (SplashPreview.java mirrors
 # CinemaxSplashView.onDraw). Output goes to android/build/preview/:
 #
 #   splash-timeline.png   one launch, frame by frame

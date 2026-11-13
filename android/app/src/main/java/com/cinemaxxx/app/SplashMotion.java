@@ -1,21 +1,19 @@
 package com.cinemaxxx.app;
 
 /**
- * The native Cinemax launch reveal, expressed as pure arithmetic.
+ * The native cinemaxxx launch reveal, expressed as pure arithmetic.
  *
- * The reveal is a short cinematic composition built from seven layers:
+ * The reveal is one short cinematic composition on a dark-red light, built from
+ * six layers. It shows the logo alone; there is no text anywhere in it:
  *
- *   · an ambient wash - the deep near-black canvas picking up three brand lights;
- *   · the wave field - three broad, curved colour bands (blue above, violet in
- *     the middle, pink-magenta below) that expand out of the central composition
- *     towards the screen edges, each on its own clock so they parallax;
+ *   · an ambient wash - the near-black canvas picking up a dim red light;
+ *   · the wave field - three broad, curved bands of deep red that expand out of
+ *     the centre towards the screen edges, each on its own clock so they parallax;
  *   · a glow that blooms behind the logo and settles onto a calm resting level;
- *   · a depth bed that lets the artwork sit in front of the light;
- *   · the logo, which dollies up from the size the launch window left it at,
- *     overshoots by a few percent and settles, lifting just enough for the
- *     finished logo-and-wordmark lockup to be centred as a whole;
- *   · a single blue-to-pink light sweep that crosses the logo once it has landed;
- *   · the CINEMAX wordmark, which fades up beneath the logo after it.
+ *   · a depth bed that lets the logo sit in front of the light;
+ *   · the logo, which dollies in from the size the launch window left it at,
+ *     overshoots by a few percent and settles, centred on the screen;
+ *   · a single red light sweep that crosses the logo once it has landed.
  *
  * Everything a frame needs is computed here, so the timeline can be checked
  * frame by frame on a plain JVM (android/tests/java/CinemaxAppTest.java):
@@ -32,11 +30,10 @@ package com.cinemaxxx.app;
  *     the page having a themed first paint. The animation never delays a ready
  *     app beyond that point, and it never runs past its own last frame.
  *
- * {@link #layout(int, int, float)} is the reason the lockup is correct on every
- * screen: one size rule for the logo, one for the wordmark, both centred on the
- * horizontal axis and centred as a pair on the vertical axis, bounded so neither
- * can ever reach a screen edge (verified for phone, small, landscape and tablet
- * sizes in the unit checks).
+ * {@link #layout(int, int, float)} is the reason the logo is correct on every
+ * screen: one size rule, centred on both axes, bounded so it can never reach a
+ * screen edge (verified for phone, small, landscape and tablet sizes in the unit
+ * checks).
  */
 public final class SplashMotion {
 
@@ -52,20 +49,18 @@ public final class SplashMotion {
     public static final int LAYER_DEPTH = 3;
     /** The logo itself: it dollies in, overshoots slightly and settles. */
     public static final int LAYER_LOGO = 4;
-    /** The blue-to-pink light sweep that crosses the logo exactly once. */
+    /** The red light sweep that crosses the logo exactly once. */
     public static final int LAYER_SWEEP = 5;
-    /** The CINEMAX wordmark: it fades up beneath the settled logo. */
-    public static final int LAYER_WORDMARK = 6;
-    public static final int LAYER_COUNT = 7;
+    public static final int LAYER_COUNT = 6;
 
     /* --------------------------------------------------------- wave bands */
 
     /** The upper band: deep and electric blue. */
-    public static final int BAND_BLUE = 0;
+    public static final int BAND_UPPER = 0;
     /** The middle band: violet into purple. */
-    public static final int BAND_VIOLET = 1;
+    public static final int BAND_MIDDLE = 1;
     /** The lower band: pink-magenta. */
-    public static final int BAND_PINK = 2;
+    public static final int BAND_LOWER = 2;
     public static final int BAND_COUNT = 3;
 
     /* ------------------------------------------------------------ timings */
@@ -73,9 +68,8 @@ public final class SplashMotion {
     /** Every layer has finished here: the reveal is a single short clip. */
     public static final long REVEAL_MILLIS = 2200L;
     /**
-     * The page may take over here: the logo has landed, the light has finished
-     * crossing it and the wordmark is up, so the frozen frame is the settled
-     * composition. Only the imperceptible tail of the glow's settle (see
+     * The page may take over here: the logo has landed and the light has finished
+     * crossing it, so the frozen frame is the settled composition. Only the imperceptible tail of the glow's settle (see
      * {@link #glowAlpha(float)}) is still moving at this point.
      */
     public static final long HANDOFF_READY_MILLIS = 1800L;
@@ -101,8 +95,8 @@ public final class SplashMotion {
      * Delay and duration per layer, in milliseconds. The goal is one continuous
      * movement: the canvas picks up its light, the colour field expands out of
      * the centre, the glow blooms behind the logo, the logo arrives and settles
-     * while its depth bed deepens, the sweep crosses it once it has landed, the
-     * wordmark rises beneath it, and the glow eases back to rest last.
+     * while its depth bed deepens, the sweep crosses it once it has landed, and
+     * the glow eases back to rest last.
      */
     private static final long[] DELAYS = {
             0L,    // ambient wash
@@ -111,7 +105,6 @@ public final class SplashMotion {
             200L,  // depth bed
             200L,  // the logo
             1050L, // light sweep
-            1150L, // the wordmark
     };
 
     private static final long[] DURATIONS = {
@@ -121,7 +114,6 @@ public final class SplashMotion {
             700L,  // depth bed
             820L,  // the logo
             480L,  // light sweep
-            620L,  // the wordmark
     };
 
     /* ------------------------------------------------- wave band behaviour */
@@ -190,8 +182,6 @@ public final class SplashMotion {
     public static final float SWEEP_PEAK_ALPHA = 0.58f;
     /** How far the sweep travels, in units of the logo's own half-extent. */
     public static final float SWEEP_TRAVEL = 1.55f;
-    /** Fraction of the wordmark's layer in which it reaches full opacity. */
-    public static final float WORDMARK_ALPHA_FULL_AT = 0.60f;
 
     /* ------------------------------------------------------------ geometry */
 
@@ -207,23 +197,6 @@ public final class SplashMotion {
      */
     public static final float LOGO_MAX_FRACTION = 0.40f;
 
-    /** The wordmark is sized from the same short edge, in the same proportion. */
-    public static final float WORDMARK_FRACTION = 0.062f;
-    /** Readability floor / boldness ceiling of the wordmark. */
-    public static final float WORDMARK_MIN_DP = 13f;
-    public static final float WORDMARK_MAX_DP = 26f;
-    /** Air between the logo and the wordmark, as a fraction of the short edge. */
-    public static final float WORDMARK_GAP_FRACTION = 0.050f;
-    /**
-     * Cap height as a fraction of the text size for the brand face. It is what
-     * turns "the gap below the logo" into a real baseline, and it keeps the
-     * lockup arithmetic pure (no font metrics needed to lay the splash out).
-     */
-    public static final float WORDMARK_CAP_RATIO = 0.72f;
-    /** The wordmark never runs wider than this fraction of the screen. */
-    public static final float WORDMARK_MAX_WIDTH_FRACTION = 0.80f;
-    /** Brand tracking of the splash wordmark, in em. */
-    public static final float WORDMARK_LETTER_SPACING_EM = 0.30f;
 
     public static final float GLOW_RADIUS_FACTOR = 0.98f;
     private static final float GLOW_MAX_FRACTION = 0.46f;
@@ -284,7 +257,7 @@ public final class SplashMotion {
         return elapsed >= REVEAL_MILLIS;
     }
 
-    /** True once the logo, the sweep and the wordmark have landed. */
+    /** True once the logo and the light sweep have landed. */
     public static boolean handoffReady(long elapsed) {
         return elapsed >= HANDOFF_READY_MILLIS;
     }
@@ -415,17 +388,6 @@ public final class SplashMotion {
     }
 
     /**
-     * How far the logo has lifted, in units of {@link SplashMotion.Layout#lockupLift}.
-     * It starts at exactly zero - the frame the launch window left on screen -
-     * and eases up so the finished logo-and-wordmark pair is centred as a whole.
-     * The travel is a few percent of the screen height, interpolated every frame,
-     * so it is a movement and never a jump.
-     */
-    public static float logoRise(float progress) {
-        return easeInOutSine(clamp01(progress));
-    }
-
-    /**
      * Where the dolly starts: the size the launch surface drew the logo at, so
      * the first frame of the reveal is the frame the launcher left behind. It can
      * never be more than 1 (the logo never starts bigger than it ends).
@@ -466,22 +428,6 @@ public final class SplashMotion {
         return travel > -0.90f && travel < 0.90f;
     }
 
-    /**
-     * Opacity of the wordmark: a restrained fade that is complete well before
-     * its layer ends, so the wordmark is simply present for the final beat.
-     */
-    public static float wordmarkAlpha(float progress) {
-        return easeOutCubic(clamp01(clamp01(progress) / WORDMARK_ALPHA_FULL_AT));
-    }
-
-    /**
-     * How far the wordmark has risen, in units of its own rise distance: 0 is
-     * its resting place, 1 is where it starts (a short way below it).
-     */
-    public static float wordmarkRise(float progress) {
-        return 1f - easeOutCubic(clamp01(progress));
-    }
-
     /* ------------------------------------------------------------ geometry */
 
     /** Viewport geometry for one screen size. Pure arithmetic - no Android types. */
@@ -489,15 +435,14 @@ public final class SplashMotion {
 
         public final int width;
         public final int height;
-        /** Centre of the screen: where the light is drawn from. */
+        /** Centre of the screen: where the light is drawn from, and where the logo rests. */
         public final float centreX;
         public final float centreY;
         /** Edge length of the square the logo is drawn into. */
         public final float logoSize;
-        /** Centre of the logo once the lockup has settled. */
-        public final float logoRestCentreY;
-        /** How far the logo lifts so the finished lockup is centred as a pair. */
-        public final float lockupLift;
+        /** Top and bottom edges of the resting logo, for the margin checks. */
+        public final float logoTop;
+        public final float logoBottom;
         /** Radius the glow sprite is drawn at. */
         public final float glowRadius;
         /** Radius of the soft dark bed under the logo. */
@@ -510,19 +455,6 @@ public final class SplashMotion {
         public final float sweepBandHalf;
         /** Half-height of the band (the rest is clipped by the layer). */
         public final float sweepBandHalfHeight;
-        /** Text size of the CINEMAX wordmark. */
-        public final float wordmarkSize;
-        /** Air between the logo and the top of the wordmark's capitals. */
-        public final float wordmarkGap;
-        /** Top of the wordmark's capitals once the lockup has settled. */
-        public final float wordmarkCapTop;
-        /** Baseline the wordmark is drawn on. */
-        public final float wordmarkBaselineY;
-        /** Widest the wordmark may be drawn before its size is reduced. */
-        public final float wordmarkMaxWidth;
-        /** Top of the settled lockup / bottom of it, for the margin checks. */
-        public final float lockupTop;
-        public final float lockupBottom;
         public final int ambientSpriteWidth;
         public final int ambientSpriteHeight;
         public final int glowSpriteSide;
@@ -533,12 +465,8 @@ public final class SplashMotion {
         public final float logoStartScale;
 
         private Layout(int width, int height, float centreX, float centreY,
-                float logoSize, float logoRestCentreY, float lockupLift,
-                float glowRadius, float depthRadius, float depthOffsetY,
+                float logoSize, float glowRadius, float depthRadius, float depthOffsetY,
                 float sweepHalfExtent, float sweepBandHalf, float sweepBandHalfHeight,
-                float wordmarkSize, float wordmarkGap, float wordmarkCapTop,
-                float wordmarkBaselineY, float wordmarkMaxWidth,
-                float lockupTop, float lockupBottom,
                 int ambientSpriteWidth, int ambientSpriteHeight, int glowSpriteSide,
                 int waveSpriteWidth, int waveSpriteHeight, float logoStartScale) {
             this.width = width;
@@ -546,21 +474,14 @@ public final class SplashMotion {
             this.centreX = centreX;
             this.centreY = centreY;
             this.logoSize = logoSize;
-            this.logoRestCentreY = logoRestCentreY;
-            this.lockupLift = lockupLift;
+            this.logoTop = centreY - logoSize * 0.5f;
+            this.logoBottom = centreY + logoSize * 0.5f;
             this.glowRadius = glowRadius;
             this.depthRadius = depthRadius;
             this.depthOffsetY = depthOffsetY;
             this.sweepHalfExtent = sweepHalfExtent;
             this.sweepBandHalf = sweepBandHalf;
             this.sweepBandHalfHeight = sweepBandHalfHeight;
-            this.wordmarkSize = wordmarkSize;
-            this.wordmarkGap = wordmarkGap;
-            this.wordmarkCapTop = wordmarkCapTop;
-            this.wordmarkBaselineY = wordmarkBaselineY;
-            this.wordmarkMaxWidth = wordmarkMaxWidth;
-            this.lockupTop = lockupTop;
-            this.lockupBottom = lockupBottom;
             this.ambientSpriteWidth = ambientSpriteWidth;
             this.ambientSpriteHeight = ambientSpriteHeight;
             this.glowSpriteSide = glowSpriteSide;
@@ -581,10 +502,9 @@ public final class SplashMotion {
     }
 
     /**
-     * Sizes everything from the viewport: the logo is centred on the horizontal
-     * axis, the logo-and-wordmark pair is centred on the vertical axis, and both
-     * are bounded so the complete lockup always fits with a healthy margin - on a
-     * small phone, in landscape and on a tablet alike.
+     * Sizes everything from the viewport: the logo is centred on both axes and is
+     * bounded so it always fits with a healthy margin - on a small phone, in
+     * landscape and on a tablet alike.
      */
     public static Layout layout(int width, int height, float density) {
         float smallest = Math.max(1f, Math.min(width, height));
@@ -601,29 +521,8 @@ public final class SplashMotion {
             logoSize = ceiling;
         }
 
-        // The wordmark is sized off the same short edge, then floored and capped
-        // so it stays legible on a small phone and never shouts on a tablet.
-        float wordmarkSize = smallest * WORDMARK_FRACTION;
-        if (wordmarkSize < dp(WORDMARK_MIN_DP, density)) {
-            wordmarkSize = dp(WORDMARK_MIN_DP, density);
-        }
-        if (wordmarkSize > dp(WORDMARK_MAX_DP, density)) {
-            wordmarkSize = dp(WORDMARK_MAX_DP, density);
-        }
-        // Never tighter than a little over half the text size, whatever the screen.
-        float wordmarkGap = Math.max(smallest * WORDMARK_GAP_FRACTION, wordmarkSize * 0.55f);
-
-        float capHeight = wordmarkSize * WORDMARK_CAP_RATIO;
-        // Centring the pair: the logo moves up by half of what hangs below it.
-        float lockupLift = (wordmarkGap + capHeight) * 0.5f;
-
         float centreX = width * 0.5f;
         float centreY = height * 0.5f;
-        float logoRestCentreY = centreY - lockupLift;
-        float wordmarkCapTop = logoRestCentreY + logoSize * 0.5f + wordmarkGap;
-        float wordmarkBaselineY = wordmarkCapTop + capHeight;
-        float lockupTop = logoRestCentreY - logoSize * 0.5f;
-        float lockupBottom = wordmarkBaselineY + wordmarkSize * 0.10f;
 
         float glowRadius = Math.min(logoSize * GLOW_RADIUS_FACTOR, smallest * GLOW_MAX_FRACTION);
         float depthRadius = logoSize * DEPTH_RADIUS_FACTOR;
@@ -633,7 +532,6 @@ public final class SplashMotion {
         // Tall enough that the rotated band always covers the artwork; the rest
         // is clipped by the sweep layer, so it costs nothing.
         float sweepBandHalfHeight = logoSize;
-        float wordmarkMaxWidth = width * WORDMARK_MAX_WIDTH_FRACTION;
 
         // The soft light and the colour field are pre-rendered once per screen
         // size, so a frame is a handful of textured quads instead of full-screen
@@ -647,11 +545,9 @@ public final class SplashMotion {
         int waveSpriteHeight = clampInt(Math.round(height / 5f),
                 WAVE_SPRITE_HEIGHT_MIN, WAVE_SPRITE_HEIGHT_MAX);
 
-        return new Layout(width, height, centreX, centreY, logoSize, logoRestCentreY, lockupLift,
+        return new Layout(width, height, centreX, centreY, logoSize,
                 glowRadius, depthRadius, depthOffsetY, sweepHalfExtent, sweepBandHalf,
-                sweepBandHalfHeight, wordmarkSize, wordmarkGap, wordmarkCapTop, wordmarkBaselineY,
-                wordmarkMaxWidth, lockupTop, lockupBottom,
-                ambientSpriteWidth, ambientSpriteHeight, glowSpriteSide,
+                sweepBandHalfHeight, ambientSpriteWidth, ambientSpriteHeight, glowSpriteSide,
                 waveSpriteWidth, waveSpriteHeight, logoScaleFrom(logoSize, density));
     }
 

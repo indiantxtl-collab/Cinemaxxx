@@ -21,7 +21,7 @@
  * CINEMAX is a streaming platform here like any other: it has its own entry, a
  * checkbox in the studio's platform picker, a disc in the home rail and its own
  * `platform-cinemax` token, and it uses the CINEMAX network's brand artwork —
- * deliberately NOT the app's own emblem (`/brand/cinemax-symbol.svg`), which
+ * deliberately NOT the app's own emblem (`/brand/cinemaxxx-logo.png`), which
  * stays the application logo.
  */
 

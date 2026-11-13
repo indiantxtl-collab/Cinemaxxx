@@ -5,8 +5,8 @@
     the WebView canvas and the page never disagree about what black is.
     The logo gradient and the Play/Explore buttons live in the web layer.
   -->
-    <color name="cinemax_ink">#020202</color>
-    <color name="cinemax_ink_soft">#030303</color>
+    <color name="cinemax_ink">#030102</color>
+    <color name="cinemax_ink_soft">#030102</color>
     <color name="cinemax_plum">#0A0A0A</color>
     <color name="cinemax_violet">#FFFFFF</color>
     <color name="cinemax_iris">#E6E6E6</color>

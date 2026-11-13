@@ -48,14 +48,14 @@ export default function CopyrightPage() {
               <p>
                 Copyright in this website&apos;s original work — its interface design, its
                 layout and motion design, its component code, its written documentation
-                including this page, and the cinemaxxx emblem, wordmark and application icon —
+                including this page, and the cinemaxxx logo and application icon —
                 belongs to the cinemaxxx project. That protection covers the expression, not
                 the ideas: a colour scheme, a rail of posters or a circle containing a logo
                 is not itself protectable subject matter.
               </p>
               <LegalFacts
                 rows={[
-                  { label: "Original artwork", value: "cinemaxxx emblem, wordmark lockup, app icon, splash animation, interface icons" },
+                  { label: "Original artwork", value: "cinemaxxx logo, app icon, splash animation, interface icons" },
                   { label: "Originals live at", value: "public/brand/, src/components/Logo.tsx, src/components/Icon.tsx" },
                   { label: "Written material", value: "The legal documents on this website, the README and the documentation in docs/" },
                   { label: "Third-party material", value: "Everything listed on /license and /attributions — not owned by this project" },
@@ -99,7 +99,7 @@ export default function CopyrightPage() {
 
             <LegalSection id="brand-assets" title="The cinemaxxx identity assets" kicker="Section 04">
               <p>
-                The emblem, the wordmark and the app icon are used unchanged everywhere they
+                The logo and the app icon are used unchanged everywhere they
                 appear: the website header, the dock, the favicon, the sharing cards, the
                 Android splash screen and the launcher icon. Their geometry and their
                 blue–violet–pink gradient are fixed, and a build check fails if they drift
@@ -107,7 +107,7 @@ export default function CopyrightPage() {
               </p>
               <LegalBullets
                 items={[
-                  "The emblem is not the logo of any broadcast network, including the cinemaxxx network, and it was not derived from one.",
+                  "The logo is not the logo of any broadcast network, including the cinemaxxx network, and it was not derived from one.",
                   "Reusing the identity in another product, or presenting it as your own, is not permitted.",
                   "Third-party platform marks are never used as this project's own branding, and this project's mark is never used as a platform logo.",
                 ]}

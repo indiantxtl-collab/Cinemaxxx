@@ -410,7 +410,7 @@ export default function BottomNav() {
                     // for a local kilobyte file would only add a request.
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src="/brand/cinemax-symbol.svg"
+                      src="/brand/cinemaxxx-logo-256.png"
                       alt=""
                       width={20}
                       height={20}

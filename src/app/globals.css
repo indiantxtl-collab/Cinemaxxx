@@ -124,11 +124,9 @@ main:focus { outline: none; }
 .page-transition { animation: page-in .3s var(--ease) both; }
 @keyframes page-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Original aperture logo. No tile, stock play triangle, or borrowed brand. */
+/* The uploaded cinemaxxx logo, shown unmodified. No text beside it. */
 .cinemax-logo { display: inline-flex; align-items: center; gap: 10px; line-height: 1; }
-.cinemax-emblem { width: 43px; height: 43px; }
-.logo-wordmark { font-family: var(--font-outfit), sans-serif; color: #f9f9f9; font-size: 31px; font-weight: 620; letter-spacing: -.065em; }
-.logo-x { background: linear-gradient(160deg, #b0a0ff 15%, #ed8bdf 65%, #ff8bba); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cinemax-emblem { display: block; width: 43px; height: 43px; object-fit: contain; }
 .brand-lockup { flex-shrink: 0; display: inline-flex; align-items: center; }
 /* No drop-shadow filter here: this emblem lives in the sticky header, and a
    filter on a moving element is re-rasterised every frame. The glow was barely
@@ -160,39 +158,22 @@ main:focus { outline: none; }
 .icon-button:active { transform: scale(.92); }
 .icon-button:disabled { opacity: .3; }
 
-/* Intro: gradients are static; only transforms and opacity move. */
-.splash-screen { position: fixed; z-index: 20000; inset: 0; display: grid; place-items: center; overflow: hidden; background: #040404; outline: none; animation: splash-safety-exit .46s ease 2.3s forwards; }
+/* Intro: a dark-red logo reveal. Only the uploaded logo is drawn; there is no text.
+   Only transform, opacity and filter animate, so the reveal stays on the compositor. */
+.splash-screen { position: fixed; z-index: 20000; inset: 0; display: grid; place-items: center; overflow: hidden; background: #050507; outline: none; animation: splash-safety-exit .46s ease 2.3s forwards; }
 html[data-cinemax-intro="seen"] .splash-screen { display: none; }
+/* Set before first paint by the layout's head script: the shell waits for the reveal. */
+html[data-cinemax-intro-pending] #cinemax-app { visibility: hidden; }
 .splash-screen.is-closing { animation: splash-exit .46s var(--ease) forwards; pointer-events: none; }
-.splash-atmosphere { position: absolute; inset: -20%; background: radial-gradient(ellipse at 39% 48%, rgba(255, 255, 255, .1), transparent 30%), radial-gradient(ellipse at 61% 49%, rgba(255, 122, 190, .1), transparent 29%), radial-gradient(ellipse at 50% 82%, rgba(255, 255, 255, .05), transparent 34%); animation: atmosphere-reveal 1.8s var(--ease) both; }
-.splash-lockup { position: relative; display: flex; flex-direction: column; align-items: center; gap: 27px; animation: splash-lockup-in .85s var(--ease) .12s both; }
-.splash-emblem { position: relative; width: 115px; height: 115px; filter: drop-shadow(0 0 22px rgba(150, 120, 255, .2)); }
-.splash-emblem > svg { width: 100%; height: 100%; }
-.splash-emblem .emblem-ribbon { transform-origin: center; animation: ribbon-reveal .9s var(--ease) .18s both; }
-.splash-emblem .emblem-fold { transform-origin: center; animation: fold-reveal .9s var(--ease) .3s both; }
-.splash-logo-sheen { position: absolute; top: -10%; left: -60%; width: 40%; height: 125%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .16), transparent); transform: skewX(-28deg); animation: emblem-sheen 1.2s ease .5s both; }
-.splash-wordmark { animation: wordmark-reveal .65s var(--ease) .45s both; }
-.splash-wordmark > .cinemax-emblem { display: none; }
-.splash-wordmark .logo-wordmark { font-size: 43px; font-weight: 550; letter-spacing: -.055em; }
-.splash-reflection { position: absolute; top: 180px; width: 110px; height: 110px; opacity: .11; transform: scaleY(-1); -webkit-mask-image: linear-gradient(transparent 15%, #000); mask-image: linear-gradient(transparent 15%, #000); }
-.splash-reflection svg { width: 100%; height: 100%; }
-.splash-ring { position: absolute; width: min(68vw, 440px); aspect-ratio: 1; border: 1px solid rgba(255, 255, 255, .08); border-radius: 50%; background: radial-gradient(circle, transparent 68%, rgba(255, 255, 255, .03) 70%, transparent 72%); animation: ring-expand 2s var(--ease) .2s both; }
-.splash-ring-two { width: min(54vw, 320px); border-color: rgba(255, 255, 255, .06); animation-delay: .6s; }
-.splash-streak { position: absolute; width: min(65vw, 650px); height: 1px; opacity: 0; background: linear-gradient(90deg, transparent, #ffffff 50%, #f1f1f1 60%, #db71cc 70%, transparent); box-shadow: 0 0 12px rgba(255, 255, 255, .22); }
-.splash-streak-one { top: 41%; left: -20%; transform: rotate(-25deg); animation: streak-travel 1.35s var(--ease) .22s both; }
-.splash-streak-two { right: -28%; bottom: 31%; transform: rotate(-25deg); animation: streak-return 1.4s var(--ease) .35s both; }
-.splash-skip { position: absolute; right: max(24px, env(safe-area-inset-right)); bottom: calc(25px + var(--safe-bottom)); display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .1); border-radius: 999px; background: rgba(12, 12, 12, .86); color: #b9b9b9; backdrop-filter: blur(10px); font-size: 12px; animation: skip-fade .3s ease .4s both; }
-.splash-skip svg { width: 16px; height: 16px; }
-@keyframes skip-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes splash-lockup-in { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes ribbon-reveal { from { opacity: 0; transform: translateX(-8px) scale(.95); } to { opacity: 1; transform: translateX(0) scale(1); } }
-@keyframes fold-reveal { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes wordmark-reveal { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes atmosphere-reveal { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
-@keyframes ring-expand { from { opacity: 0; transform: scale(.6); } 30% { opacity: .85; } to { opacity: 0; transform: scale(1.65); } }
-@keyframes emblem-sheen { from { opacity: 0; transform: translateX(0) skewX(-28deg); } 30% { opacity: 1; } to { opacity: 0; transform: translateX(430%) skewX(-28deg); } }
-@keyframes streak-travel { from { opacity: 0; transform: translate(-50%, 110px) rotate(-25deg); } 45% { opacity: .65; } to { opacity: 0; transform: translate(180%, -120px) rotate(-25deg); } }
-@keyframes streak-return { from { opacity: 0; transform: translate(40%, -100px) rotate(-25deg); } 45% { opacity: .5; } to { opacity: 0; transform: translate(-190%, 90px) rotate(-25deg); } }
+.splash-glow { position: absolute; left: 50%; top: 50%; width: min(130vw, 980px); aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(226, 18, 48, .5) 0%, rgba(128, 0, 22, .26) 36%, transparent 66%); animation: splash-glow-bloom 2.1s var(--ease) .05s both; }
+.splash-lockup { position: relative; width: min(46vw, 250px); aspect-ratio: 1; animation: splash-logo-in 1.7s var(--ease) .15s both; }
+.splash-logo { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 18px rgba(226, 18, 48, .45)); user-select: none; -webkit-user-drag: none; }
+.splash-sheen { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255, 150, 165, .9) 50%, transparent 62%) 100% 0 / 260% 100% no-repeat; -webkit-mask: url("/brand/cinemaxxx-logo-512.png") center / contain no-repeat; mask: url("/brand/cinemaxxx-logo-512.png") center / contain no-repeat; animation: splash-sheen 1.1s ease 1.05s both; }
+.splash-skip { position: absolute; inset: 0; z-index: 1; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.splash-skip:focus-visible { outline: 2px solid rgba(255, 120, 140, .8); outline-offset: -8px; }
+@keyframes splash-glow-bloom { from { opacity: 0; transform: translate(-50%, -50%) scale(.55); } 45% { opacity: 1; } to { opacity: .8; transform: translate(-50%, -50%) scale(1); } }
+@keyframes splash-logo-in { from { opacity: 0; transform: scale(.86); filter: blur(10px) brightness(.45); } 55% { opacity: 1; filter: blur(0) brightness(1.15); } to { opacity: 1; transform: scale(1); filter: blur(0) brightness(1); } }
+@keyframes splash-sheen { from { background-position: 100% 0; } to { background-position: 0% 0; } }
 @keyframes splash-exit { to { opacity: 0; transform: scale(1.035); visibility: hidden; } }
 @keyframes splash-safety-exit { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
@@ -396,7 +377,6 @@ html[data-cinemax-intro="seen"] .splash-screen { display: none; }
 .hero-empty .hero-title { margin-top: 23px; font-size: clamp(40px, 4.3vw, 62px); text-transform: none; }
 .hero-empty-logo { opacity: .65; }
 .hero-empty-logo .cinemax-emblem { width: 30px; height: 30px; }
-.hero-empty-logo .logo-wordmark { font-size: 25px; }
 .hero-empty-copy { max-width: 400px; margin-top: 18px; color: var(--text-soft); font-size: 14px; line-height: 1.7; }
 .hero-loading-atmosphere { position: absolute; inset: 0; opacity: .65; }
 .hero-skeleton-title { width: min(400px, 100%); height: 70px; border-radius: 10px; }
@@ -495,7 +475,6 @@ html[data-cinemax-intro="seen"] .splash-screen { display: none; }
 .site-footer { display: flex; align-items: center; gap: 32px; margin: 60px var(--gutter) 0; padding: 30px 0 8px; border-top: 1px solid rgba(172, 172, 172, .08); color: #9e9e9e; font-size: 11px; }
 .site-footer .cinemax-logo { gap: 7px; opacity: .6; }
 .site-footer .cinemax-emblem { width: 26px; height: 26px; }
-.site-footer .logo-wordmark { font-size: 23px; }
 .site-footer > div { display: flex; gap: 25px; }
 .site-footer > span { margin-left: auto; font-size: 10px; }
 /* Website-only legal links: a second, quieter row inside the same footer. */
@@ -895,11 +874,7 @@ html:fullscreen, html:fullscreen body { width: 100%; height: 100%; min-height: 1
   .empty-title { font-size: 23px; }
   .empty-copy { font-size: 12px; }
   .watchlist-empty { min-height: 52svh; }
-  .splash-emblem { width: 95px; height: 95px; }
-  .splash-wordmark .logo-wordmark { font-size: 38px; }
-  .splash-lockup { gap: 22px; }
-  .splash-reflection { top: 160px; width: 95px; height: 95px; }
-  .splash-skip { right: 20px; }
+  .splash-lockup { width: min(60vw, 210px); }
   .detail-backdrop { height: auto; min-height: 640px; padding-top: 145px; }
   .detail-backdrop-image { object-position: 61% top; }
   .detail-backdrop-fade { background: linear-gradient(0deg, var(--bg), rgba(4, 4, 4, .95) 20%, rgba(4, 4, 4, .6) 52%, rgba(4, 4, 4, .05) 86%), linear-gradient(90deg, rgba(4, 4, 4, .2), transparent); }
@@ -966,13 +941,12 @@ html:fullscreen, html:fullscreen body { width: 100%; height: 100%; min-height: 1
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-  .splash-ring, .splash-streak, .splash-logo-sheen, .splash-reflection { display: none; }
+  .splash-glow, .splash-sheen { display: none; }
   .splash-screen.is-closing { opacity: 0; visibility: hidden; }
   .cinematic-button:hover, .movie-card:hover, .collection-card:hover, .collection-spotlight:hover { transform: none; }
 }
 .studio-dashboard { width: min(100%, 1000px); margin-inline: auto; }
 .studio-dashboard .cinemax-emblem { width: 34px; height: 34px; }
-.studio-dashboard .logo-wordmark { font-size: 26px; }
 /* Missing external artwork remains atmospheric, never an invented movie record. */
 .artwork-backdrop-placeholder { background: url('/cinemax-atmosphere.webp') center / cover no-repeat, #080808; }
 

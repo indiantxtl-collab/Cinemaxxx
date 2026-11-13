@@ -17,7 +17,6 @@ android/
 ├── tools/
 │   ├── fetch-toolchain.sh        pinned, checksum-verified tool downloads
 │   ├── align_apk.py              zipalign-equivalent alignment (4-byte / 4096-byte)
-│   ├── make_legacy_icons.py      raster launcher icons for API 24/25
 │   ├── SplashPreview.java        renders the splash offline (no device)
 │   └── preview-splash.sh         runs that render: timeline, screens, sweep
 ├── tests/
@@ -139,9 +138,9 @@ changes; the layer is an extra stylesheet plus a small runtime, scoped to
 viewport, touch behaviour, scroll state and artwork warm-up). Both are evaluated
 by `MainActivity.applyAppTheme()` after the first paint, so the native splash
 lifts onto an already-themed page. The splash itself needs no asset of its own:
-it draws the single `cinemax_emblem` vector the app icon, the launch window and
-the offline screen already use, so the presentation layer ships exactly two
-files.
+it draws `cinemaxxx_logo` (the uploaded logo, `drawable-nodpi/cinemaxxx_logo.png`),
+the same PNG the launch window and the Android 12+ splash icon use. The
+presentation layer ships no font and no text.
 
 ## Scroll performance
 

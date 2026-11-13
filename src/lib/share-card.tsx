@@ -75,11 +75,11 @@ async function transcodeToJpeg(buffer: Buffer): Promise<string | null> {
   }
 }
 
-/** The project's own emblem, from the file that ships with the site. */
+/** The cinemaxxx logo, from the file that ships with the site (transparent PNG, 512px). */
 async function emblemDataUri(): Promise<string | null> {
   try {
-    const svg = await readFile(join(process.cwd(), "public", "brand", "cinemax-symbol.svg"));
-    return `data:image/svg+xml;base64,${svg.toString("base64")}`;
+    const png = await readFile(join(process.cwd(), "public", "brand", "cinemaxxx-logo-512.png"));
+    return `data:image/png;base64,${png.toString("base64")}`;
   } catch {
     return null;
   }
